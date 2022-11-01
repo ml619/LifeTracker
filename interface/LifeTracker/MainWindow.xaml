@@ -43,6 +43,17 @@
                 <DatePicker SelectedDateChanged="ArrivalDatePicker_DateChanged" HorizontalAlignment="Left" Margin="100,18,0,0" VerticalAlignment="Top" Name="SelectDisplayWeek"/>
                 <TextBlock Name="MondayText" HorizontalAlignment="Left" Margin="110,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" />
                 <TextBlock Name="TuesdayText" HorizontalAlignment="Left" Margin="202,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" />
+                <TextBlock x:Name="mondayText" HorizontalAlignment="Left" Margin="120,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="tuesdayText" HorizontalAlignment="Left" Margin="220,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="wednesdayText" HorizontalAlignment="Left" Margin="320,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="thursdayText" HorizontalAlignment="Left" Margin="419,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="fridayText" HorizontalAlignment="Left" Margin="519,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="saturdayText" HorizontalAlignment="Left" Margin="619,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="sundayText" HorizontalAlignment="Left" Margin="720,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock x:Name="weekSpanText" HorizontalAlignment="Left" Margin="308,15,0,0" TextWrapping="Wrap" Text="December 12 - December 12" VerticalAlignment="Top" FontSize="22" TextAlignment="Center"/>
+                <Polygon x:Name="weekForward" Points="0,0 16,10, 0,20" Stroke="Black" Fill="Black" Margin="617,20,187,413" MouseLeftButtonDown="MoveWeekForward"/>
+                <Polygon x:Name="weekBack" Points="16,0 0,10, 16,20" Stroke="Black" Fill="Black" Margin="265,21,539,412" MouseLeftButtonDown="MoveWeekBackward"/>
+                <TextBlock x:Name="yearText" HorizontalAlignment="Left" Margin="697,15,0,0" TextWrapping="Wrap" Text="2022" VerticalAlignment="Top" FontSize="22" TextAlignment="Center" Width="69"/>
             </Grid>
         </Viewbox>
     </Viewbox>

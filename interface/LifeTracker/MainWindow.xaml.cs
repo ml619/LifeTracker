@@ -77,9 +77,18 @@ namespace LifeTracker
         private void UpdateDisplayDates(DateTime inputDate)
         {
             // Update M-F numbers
+            TextBlock[] weekdayTexts = { mondayText, tuesdayText, wednesdayText, thursdayText, 
+                    fridayText, saturdayText, sundayText };
+            for (int i = 0; i <= 6; i++)
+            {
+                weekdayTexts[i].Text = (displayStartOfWeek.AddDays(i)).Month + "/" +
+                    (displayStartOfWeek.AddDays(i)).Day;
+            }
 
             // Update week span text
-
+            weekSpanText.Text = displayStartOfWeek.ToString("MMMM") +" "+ displayStartOfWeek.Day +" - "+
+                (displayStartOfWeek.AddDays(6)).ToString("MMMM") +" "+ (displayStartOfWeek.AddDays(6)).Day;
+            yearText.Text = displayStartOfWeek.ToString("yyyy");
         }
 
         private void Add_Button_Click(object sender, RoutedEventArgs e)
@@ -87,6 +96,18 @@ namespace LifeTracker
             // Pop up Create Event window.
             CreateEventWindow createWin = new CreateEventWindow();
             createWin.Show();
+        }
+        private void MoveWeekForward(object sender, RoutedEventArgs e)
+        {
+            // Update display and week being accessed.
+            displayStartOfWeek = displayStartOfWeek.AddDays(7);
+            UpdateDisplayDates(displayStartOfWeek);
+        }
+        private void MoveWeekBackward(object sender, RoutedEventArgs e)
+        {
+            // Update display and week being accessed.
+            displayStartOfWeek = displayStartOfWeek.AddDays(-7);
+            UpdateDisplayDates(displayStartOfWeek);
         }
     }
 }

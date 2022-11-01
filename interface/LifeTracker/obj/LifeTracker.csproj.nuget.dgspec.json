@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\cohene4\\Documents\\LifeTracker\\LifeTracker\\LifeTracker.csproj": {}
+    "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj": {}
   },
   "projects": {
-    "C:\\Users\\cohene4\\Documents\\LifeTracker\\LifeTracker\\LifeTracker.csproj": {
+    "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\cohene4\\Documents\\LifeTracker\\LifeTracker\\LifeTracker.csproj",
+        "projectUniqueName": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
         "projectName": "LifeTracker",
-        "projectPath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\LifeTracker\\LifeTracker.csproj",
+        "projectPath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
         "packagesPath": "C:\\Users\\cohene4\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\LifeTracker\\obj\\",
+        "outputPath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\cohene4\\AppData\\Roaming\\NuGet\\NuGet.Config",
