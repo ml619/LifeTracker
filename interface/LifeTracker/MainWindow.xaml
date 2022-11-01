@@ -27,7 +27,7 @@
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="586,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="96" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="686,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="96" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <TextBlock HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="LifeTracker" VerticalAlignment="Top" Height="22" Width="65" TextAlignment="Center" FontSize="19" FontFamily="Freestyle Script" FontWeight="Bold" LineStackingStrategy="MaxHeight" FontStretch="Normal" LineHeight="16"/>
-                <Button Content="Add" HorizontalAlignment="Left" Margin="15,74,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
+                <Button Content="Add" HorizontalAlignment="Left" Margin="15,74,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="Add_Button_Click"/>
                 <Button Content="Reschedule" HorizontalAlignment="Left" Margin="15,125,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
                 <Button Content="Availability" HorizontalAlignment="Left" Margin="15,176,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
                 <TextBlock HorizontalAlignment="Left" Margin="87,65,0,0" TextWrapping="Wrap" Text="Monday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
@@ -40,6 +40,9 @@
                 <Button Content="Exit" HorizontalAlignment="Left" Margin="17,393,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFF39A9A" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="CloseButton_Click"/>
                 <Button Content="        Mute" HorizontalAlignment="Left" Margin="17,349,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
                 <Button Content="Minimize" HorizontalAlignment="Left" Margin="17,371,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFFFEFA0" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MinButton_Click"/>
+                <DatePicker SelectedDateChanged="ArrivalDatePicker_DateChanged" HorizontalAlignment="Left" Margin="100,18,0,0" VerticalAlignment="Top" Name="SelectDisplayWeek"/>
+                <TextBlock Name="MondayText" HorizontalAlignment="Left" Margin="110,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" />
+                <TextBlock Name="TuesdayText" HorizontalAlignment="Left" Margin="202,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" />
             </Grid>
         </Viewbox>
     </Viewbox>

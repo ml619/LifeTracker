@@ -23,7 +23,13 @@ namespace LifeTracker
         public MainWindow()
         {
             InitializeComponent();
+            SelectDisplayWeek.SelectedDate = DateTime.Today;
         }
+
+        //PUBLIC VARIABLES
+            //Monday DateTime for Monday of week currently being displayed
+        public DateTime displayStartOfWeek = DateTime.Today; 
+
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -32,6 +38,55 @@ namespace LifeTracker
         private void MinButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+        }
+        private void ArrivalDatePicker_DateChanged(object sender, EventArgs e)
+        {
+            //TuesdayText.Text = (FindNearestMonday(SelectDisplayWeek.SelectedDate.Value)).ToString();
+
+
+            // Set week with Monday at the start.
+            displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
+            UpdateDisplayDates(displayStartOfWeek);
+            // (use this to access events from JSON)
+            long epochVal = (new DateTimeOffset(displayStartOfWeek)).ToUniversalTime().ToUnixTimeMilliseconds();
+
+            // Update displayed events to reflect current week.
+
+            // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably)
+            // ACCESS MIKE'S DATA STUFF
+            // GO THROUGH AND DISPLAY THAT DATA ON CALENDAR
+
+            //TRY THIS OUT BELOW TO CREATE EVENT ON SCREEN?
+            //button.Content = rectangle;
+
+        }
+
+        private DateTime FindNearestMonday(DateTime inputDate)
+        {
+            DateTime retDate = new DateTime();
+
+            // Find nearest Monday (going backwards in time), use result to find
+            //  corresponding week in stored data.
+            // Day of week is found numerically - Monday = 0, Sunday = 6
+            // Track backwards until reach Monday
+            int curWeekDayNum = (int)(SelectDisplayWeek.SelectedDate.Value.DayOfWeek + 6) % 7;
+            retDate = inputDate.AddDays(-curWeekDayNum);
+            return retDate;
+        }
+
+        private void UpdateDisplayDates(DateTime inputDate)
+        {
+            // Update M-F numbers
+
+            // Update week span text
+
+        }
+
+        private void Add_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Pop up Create Event window.
+            CreateEventWindow createWin = new CreateEventWindow();
+            createWin.Show();
         }
     }
 }
