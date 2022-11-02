@@ -9,16 +9,13 @@
     <Viewbox Stretch="Fill">
         <Viewbox Stretch="UniformToFill">
             <Grid Background="#E8E5FFE4" Height="453" Width="821">
-                <Rectangle HorizontalAlignment="Left" Height="367" Margin="80,57,0,0" Stroke="Black" VerticalAlignment="Top" Width="710" RadiusX="10" RadiusY="10" Fill="#FFEBEBEB"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="63*"/>
+                    <RowDefinition Height="88*"/>
+                </Grid.RowDefinitions>
+                <Rectangle HorizontalAlignment="Left" Height="386" Margin="80,57,0,0" Stroke="Black" VerticalAlignment="Top" Width="731" RadiusX="10" RadiusY="10" Fill="#FFEBEBEB" Grid.RowSpan="2"/>
                 <Rectangle HorizontalAlignment="Left" Height="44" Margin="80,8,0,0" Stroke="Black" VerticalAlignment="Top" Width="710" RadiusX="15" RadiusY="15" Fill="#FFB4DCB3"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="87,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="187,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="287,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="387,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="487,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="587,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="300" Margin="687,117,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
-                <Rectangle HorizontalAlignment="Left" Height="367" Margin="10,57,0,0" Stroke="Black" VerticalAlignment="Top" Width="65" RadiusX="10" RadiusY="10" Fill="#FFEBEBEB"/>
+                <Rectangle HorizontalAlignment="Left" Height="386" Margin="10,57,0,0" Stroke="Black" VerticalAlignment="Top" Width="65" RadiusX="10" RadiusY="10" Fill="#FFEBEBEB" Grid.RowSpan="2"/>
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="87,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="187,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="287,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
@@ -29,7 +26,7 @@
                 <TextBlock HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="LifeTracker" VerticalAlignment="Top" Height="22" Width="65" TextAlignment="Center" FontSize="19" FontFamily="Freestyle Script" FontWeight="Bold" LineStackingStrategy="MaxHeight" FontStretch="Normal" LineHeight="16"/>
                 <Button Content="Add" HorizontalAlignment="Left" Margin="15,74,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="Add_Button_Click"/>
                 <Button Content="Reschedule" HorizontalAlignment="Left" Margin="15,125,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
-                <Button Content="Availability" HorizontalAlignment="Left" Margin="15,176,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
+                <Button Content="Availability" HorizontalAlignment="Left" Margin="15,176,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Grid.RowSpan="2"/>
                 <TextBlock HorizontalAlignment="Left" Margin="87,65,0,0" TextWrapping="Wrap" Text="Monday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="187,65,0,0" TextWrapping="Wrap" Text="Tuesday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="287,65,0,0" TextWrapping="Wrap" Text="Wednesday" VerticalAlignment="Top" TextAlignment="Center" Width="94" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
@@ -37,23 +34,36 @@
                 <TextBlock HorizontalAlignment="Left" Margin="487,65,0,0" TextWrapping="Wrap" Text="Friday" VerticalAlignment="Top" TextAlignment="Center" Width="94" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="587,65,0,0" TextWrapping="Wrap" Text="Saturday" VerticalAlignment="Top" TextAlignment="Center" Width="94" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="687,65,0,0" TextWrapping="Wrap" Text="Sunday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
-                <Button Content="Exit" HorizontalAlignment="Left" Margin="17,393,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFF39A9A" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="CloseButton_Click"/>
-                <Button Content="        Mute" HorizontalAlignment="Left" Margin="17,349,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
-                <Button Content="Minimize" HorizontalAlignment="Left" Margin="17,371,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFFFEFA0" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MinButton_Click"/>
+                <Button Content="Exit" HorizontalAlignment="Left" Margin="17,204,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFF39A9A" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="CloseButton_Click" Grid.Row="1"/>
+                <Button Content="        Mute" HorizontalAlignment="Left" Margin="17,160,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Grid.Row="1"/>
+                <Button Content="Minimize" HorizontalAlignment="Left" Margin="17,182,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFFFEFA0" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MinButton_Click" Grid.Row="1"/>
                 <DatePicker SelectedDateChanged="ArrivalDatePicker_DateChanged" HorizontalAlignment="Left" Margin="100,18,0,0" VerticalAlignment="Top" Name="SelectDisplayWeek"/>
-                <TextBlock Name="MondayText" HorizontalAlignment="Left" Margin="110,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" />
-                <TextBlock Name="TuesdayText" HorizontalAlignment="Left" Margin="202,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" />
-                <TextBlock x:Name="mondayText" HorizontalAlignment="Left" Margin="120,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
-                <TextBlock x:Name="tuesdayText" HorizontalAlignment="Left" Margin="220,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
-                <TextBlock x:Name="wednesdayText" HorizontalAlignment="Left" Margin="320,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
-                <TextBlock x:Name="thursdayText" HorizontalAlignment="Left" Margin="419,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
-                <TextBlock x:Name="fridayText" HorizontalAlignment="Left" Margin="519,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
-                <TextBlock x:Name="saturdayText" HorizontalAlignment="Left" Margin="619,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
-                <TextBlock x:Name="sundayText" HorizontalAlignment="Left" Margin="720,87,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" TextAlignment="Center"/>
+                <TextBlock Name="MondayText" HorizontalAlignment="Left" Margin="110,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" />
+                <TextBlock Name="TuesdayText" HorizontalAlignment="Left" Margin="202,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" />
+                <TextBlock x:Name="mondayText" HorizontalAlignment="Left" Margin="120,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock x:Name="tuesdayText" HorizontalAlignment="Left" Margin="220,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock x:Name="wednesdayText" HorizontalAlignment="Left" Margin="320,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock x:Name="thursdayText" HorizontalAlignment="Left" Margin="419,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock x:Name="fridayText" HorizontalAlignment="Left" Margin="519,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock x:Name="saturdayText" HorizontalAlignment="Left" Margin="619,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock x:Name="sundayText" HorizontalAlignment="Left" Margin="720,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
                 <TextBlock x:Name="weekSpanText" HorizontalAlignment="Left" Margin="308,15,0,0" TextWrapping="Wrap" Text="December 12 - December 12" VerticalAlignment="Top" FontSize="22" TextAlignment="Center"/>
-                <Polygon x:Name="weekForward" Points="0,0 16,10, 0,20" Stroke="Black" Fill="Black" Margin="617,20,187,413" MouseLeftButtonDown="MoveWeekForward"/>
-                <Polygon x:Name="weekBack" Points="16,0 0,10, 16,20" Stroke="Black" Fill="Black" Margin="265,21,539,412" MouseLeftButtonDown="MoveWeekBackward"/>
+                <Polygon x:Name="weekForward" Points="0,0 16,10, 0,20" Stroke="Black" Fill="Black" Margin="617,20,187,149" MouseLeftButtonDown="MoveWeekForward"/>
+                <Polygon x:Name="weekBack" Points="16,0 0,10, 16,20" Stroke="Black" Fill="Black" Margin="265,21,539,148" MouseLeftButtonDown="MoveWeekBackward"/>
                 <TextBlock x:Name="yearText" HorizontalAlignment="Left" Margin="697,15,0,0" TextWrapping="Wrap" Text="2022" VerticalAlignment="Top" FontSize="22" TextAlignment="Center" Width="69"/>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="82,115,10,23" Grid.RowSpan="2">
+                    <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0">
+                        <Grid Margin="0,0,0,0" Height="768">
+                            <Rectangle x:Name="mondayCol" HorizontalAlignment="Left" Height="768" Margin="6,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
+                            <Rectangle x:Name="tuesdayCol" HorizontalAlignment="Left" Height="768" Margin="106,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
+                            <Rectangle x:Name="wednesdayCol" HorizontalAlignment="Left" Height="768" Margin="206,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
+                            <Rectangle x:Name="thursdayCol" HorizontalAlignment="Left" Height="768" Margin="307,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="94" RadiusX="10" RadiusY="10" Fill="White"/>
+                            <Rectangle x:Name="fridayCol" HorizontalAlignment="Left" Height="768" Margin="406,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
+                            <Rectangle x:Name="saturdayCol" HorizontalAlignment="Left" Height="768" Margin="506,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
+                            <Rectangle x:Name="sundayCol" HorizontalAlignment="Left" Height="768" Margin="606,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
         </Viewbox>
     </Viewbox>

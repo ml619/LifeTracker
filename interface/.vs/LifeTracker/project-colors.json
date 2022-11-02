@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "bf34118c-5c91-447b-ac24-0b584825565e": {
+      "ProjectGuid": "bf34118c-5c91-447b-ac24-0b584825565e",
+      "DisplayName": "LifeTracker",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

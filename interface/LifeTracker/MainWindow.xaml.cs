@@ -18,6 +18,7 @@ namespace LifeTracker
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -26,9 +27,9 @@ namespace LifeTracker
             SelectDisplayWeek.SelectedDate = DateTime.Today;
         }
 
-        //PUBLIC VARIABLES
-            //Monday DateTime for Monday of week currently being displayed
-        public DateTime displayStartOfWeek = DateTime.Today; 
+        public DateTime displayStartOfWeek = DateTime.Today;
+        //current week loaded (TEMPORARILY A BLANK WEEK - FINAL SHOULD LOAD WEEK WITH CURRENT DATE) - DEBUG
+        public static week currentWeek = new week();
 
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -52,13 +53,47 @@ namespace LifeTracker
 
             // Update displayed events to reflect current week.
 
-            // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably)
+            // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably) - DEBUG
             // ACCESS MIKE'S DATA STUFF
             // GO THROUGH AND DISPLAY THAT DATA ON CALENDAR
 
             //TRY THIS OUT BELOW TO CREATE EVENT ON SCREEN?
             //button.Content = rectangle;
 
+        }
+
+        private void AddEventToDisplay(Event curEvent)
+        {
+            //Set x margin to correspond to day of week
+            DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
+            int x_margin = 100*((int)datetime.DayOfWeek)+6;
+
+            //Set y_margin to correspond to time during day
+            //each 1/4 hour = 8 units
+            int y_margin = 8*(ConvertTimeToHeightNumber(datetime)) + 11;
+
+            //Create Rectangle
+            Rectangle rec = new Rectangle()
+            {
+                Width = 95, //set width
+                Height = 8 * 4, //SHOULD BE UPDATED TO MATCH END TIME IN EVENT (for now set to 1 hour by default)
+                Fill = (SolidColorBrush)new BrushConverter().ConvertFromString(curEvent.GetColor()),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(x_margin, y_margin, 0, 0),
+                Stroke = Brushes.Black,
+                VerticalAlignment = VerticalAlignment.Top,
+                RadiusX = 10,
+                RadiusY = 10,
+            };
+        }
+
+        private int ConvertTimeToHeightNumber(DateTime inputTime)
+        {
+            int retNum = 0;
+            String timeString = inputTime.ToString("H:mm");
+            retNum = Convert.ToInt32(timeString.Substring(0,2))*4;
+            retNum += Convert.ToInt32(timeString.Substring(2))%15; //in increments of 15
+            return retNum;
         }
 
         private DateTime FindNearestMonday(DateTime inputDate)
@@ -108,6 +143,177 @@ namespace LifeTracker
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(-7);
             UpdateDisplayDates(displayStartOfWeek);
+        }
+    }
+
+    public class Event //description, priority, time, color, flexibility
+    {
+
+        protected private string name; // name of event
+
+        public string GetName()
+        {
+            return name;
+        }
+        public void SetName(string Name)
+        {
+            name = Name;
+        }
+
+
+        protected private long date_time; //date and time in epoch
+
+        public long GetDate_Time()
+        {
+            return date_time;
+        }
+        public void SetDate_Time(long Date_Time)
+        {
+            date_time = Date_Time;
+        }
+
+
+
+        protected private string color; // color of event
+
+        public string GetColor()
+        {
+            return color;
+        }
+        public void SetColor(string Color)
+        {
+            color = Color;
+        }
+
+
+
+        protected private int flexibility;
+
+        public int GetFlexibility()
+        {
+            return flexibility;
+        }
+        public void SetFlexibility(int Flexibility)
+        {
+            flexibility = Flexibility;
+        }
+
+
+
+        protected private string priority;
+
+        public string GetPriority()
+        {
+            return priority;
+        }
+        public void SetPriority(string Priority)
+        {
+            priority = Priority;
+        }
+
+
+
+        protected private string description; //short description of acitiviy 
+
+        public string GetDescription()
+        {
+            return description;
+        }
+        public void SetDescription(string Description)
+        {
+            description = Description;
+        }
+
+
+        /*public void Equality(Event event1, Event event2)
+        {
+            if (event1.name != event2.name){
+                break;
+            }
+            if (event1.date_time != event2.date_time){
+                break;
+            }
+            if (event1.color != event2.color){
+                break;
+            }
+            if (event1.flexibility != event2.flexibility){
+                break;
+            }
+            if (event1.priority != event2.priority){
+                break;
+            }
+            if (event1.description != event2.description){
+                break;
+            }
+            else {
+                return true;
+            }
+        }*/
+    }
+
+    class location : Event
+    {
+        protected private string eventname; // name of location
+        public string GetEventName()
+        {
+            return eventname;
+        }
+        public void SetEventName(string EventName)
+        {
+            eventname = EventName;
+        }
+
+    }
+
+    class recurring : Event
+    {
+        private protected long end_date; // end of recurring 
+        public long GetEnd_Date()
+        {
+            return end_date;
+        }
+        public void SetEnd_Date(long End_Date)
+        {
+            end_date = End_Date;
+        }
+
+
+        private protected int step; //how often 
+        public int GetStep()
+        {
+            return step;
+        }
+        public void Step(int Step)
+        {
+            step = Step;
+        }
+    }
+
+    public class week
+    {
+        protected private static List<Event> mon = new List<Event>(); //lists of events
+        protected private static List<Event> tue = new List<Event>();
+        protected private static List<Event> wed = new List<Event>();
+        protected private static List<Event> thu = new List<Event>();
+        protected private static List<Event> fri = new List<Event>();
+        protected private static List<Event> sat = new List<Event>();
+        protected private static List<Event> sun = new List<Event>();
+
+        protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
+
+        public List<List<Event>> GetWeek()
+        {
+            return a_week;
+        }
+
+        public void Add(Event event1, int day)
+        {
+            a_week[day].Add(event1);
+        }
+
+        public void Delete(Event event1, int day)
+        {
+            a_week[day].Remove(event1);
         }
     }
 }
