@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LifeTracker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Maximized" WindowStyle="None">
+        Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight" WindowState="Maximized">
     <Viewbox Stretch="Fill">
         <Viewbox Stretch="UniformToFill">
             <Grid Background="#E8E5FFE4" Height="453" Width="821">
@@ -24,7 +24,7 @@
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="586,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="96" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="686,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="96" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <TextBlock HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="LifeTracker" VerticalAlignment="Top" Height="22" Width="65" TextAlignment="Center" FontSize="19" FontFamily="Freestyle Script" FontWeight="Bold" LineStackingStrategy="MaxHeight" FontStretch="Normal" LineHeight="16"/>
-                <Button Content="Add" HorizontalAlignment="Left" Margin="15,74,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="Add_Button_Click"/>
+                <Button Content="Add" HorizontalAlignment="Left" Margin="15,74,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="AddButtonClick"/>
                 <Button Content="Reschedule" HorizontalAlignment="Left" Margin="15,125,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
                 <Button Content="Availability" HorizontalAlignment="Left" Margin="15,176,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Grid.RowSpan="2"/>
                 <TextBlock HorizontalAlignment="Left" Margin="87,65,0,0" TextWrapping="Wrap" Text="Monday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
@@ -53,7 +53,7 @@
                 <TextBlock x:Name="yearText" HorizontalAlignment="Left" Margin="697,15,0,0" TextWrapping="Wrap" Text="2022" VerticalAlignment="Top" FontSize="22" TextAlignment="Center" Width="69"/>
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="82,115,10,23" Grid.RowSpan="2">
                     <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0">
-                        <Grid Margin="0,0,0,0" Height="768">
+                        <Grid Name="Scroll_Area" Margin="0,0,0,0" Height="768">
                             <Rectangle x:Name="mondayCol" HorizontalAlignment="Left" Height="768" Margin="6,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
                             <Rectangle x:Name="tuesdayCol" HorizontalAlignment="Left" Height="768" Margin="106,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>
                             <Rectangle x:Name="wednesdayCol" HorizontalAlignment="Left" Height="768" Margin="206,11,0,0" Stroke="Black" VerticalAlignment="Top" Width="95" RadiusX="10" RadiusY="10" Fill="White"/>

@@ -43,9 +43,14 @@ namespace LifeTracker
                         TimeList1.Items.Add(i + ":" + "0" + j);
                         TimeList2.Items.Add(i + ":" + "0" + j);
                     }
+                    else
+                    {
+                        TimeList1.Items.Add(i + ":" + j);
+                        TimeList2.Items.Add(i + ":" + j);
+                    }
                 }
             }
-            TimeList1.SelectedIndex = 0; TimeList2.SelectedIndex = 0;
+            TimeList1.SelectedIndex = 0; TimeList2.SelectedIndex = 4;
             AMPM1.Items.Add("AM"); AMPM1.Items.Add("PM");
             AMPM2.Items.Add("AM"); AMPM2.Items.Add("PM");
             AMPM1.SelectedIndex = 0; AMPM2.SelectedIndex = 0;
@@ -65,7 +70,8 @@ namespace LifeTracker
 
             for (int i = 1; i <= 31; i++)
             {
-                DayList.Items.Add(i.ToString());
+                if (i > 9) DayList.Items.Add(i.ToString());
+                else DayList.Items.Add("0" + i.ToString());
             }
             DayList.SelectedIndex = 0;
 
@@ -79,11 +85,12 @@ namespace LifeTracker
             ColorList.Items.Add("Green"); ColorList.Items.Add("Yellow");
             ColorList.Items.Add("Purple"); ColorList.Items.Add("White");
             ColorList.Items.Add("Brown"); ColorList.Items.Add("Orange");
-            ColorList.SelectedIndex = 0;
+            ColorList.Text = "Red";
         }
 
         private void Okay_Button_Click(object sender, RoutedEventArgs e)
         {
+            /*
             //Create Event object.
             Event newEvent = CreateEvent();
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(newEvent.GetDate_Time()).DateTime;
@@ -99,8 +106,10 @@ namespace LifeTracker
             //each 1/4 hour = 8 units
             int retNum = 0;
             String timeString = datetime.ToString("HH:mm");
-            retNum = Convert.ToInt32(timeString.Substring(0, 2)) * 4;
-            retNum += Convert.ToInt32(timeString.Substring(3)) % 15; //in increments of 15
+            String hourString1 = timeString.Substring(0, 2);
+            String hourString2 = timeString.Substring(3);
+            if (hourString1.Substring(0, 1) == "0") { hourString1 = hourString1.Substring(1); }
+            if (hourString2.Substring(0, 1) == "0") { hourString2 = hourString2.Substring(1); }
 
             int y_margin = 8 * (retNum) + 11;
 
@@ -117,9 +126,11 @@ namespace LifeTracker
                 RadiusX = 10,
                 RadiusY = 10,
             };
+            //Scroll_Area.Children.Add(rec);
 
             //HOW ADD THIS TO THE MAIN WINDOW?????? - DEBUG
 
+            */
 
 
 
@@ -127,7 +138,7 @@ namespace LifeTracker
             this.Close();
         }
 
-        private Event CreateEvent()
+        /*private Event CreateEvent()
         {
             Event retEvent = new Event();
 
@@ -164,5 +175,6 @@ namespace LifeTracker
             
             return (int)t.TotalSeconds;
         }
+        */
     }
 }

@@ -1,0 +1,46 @@
+﻿<Window x:Class="LifeTracker.EditEventWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LifeTracker"
+        mc:Ignorable="d"
+        Title="EditEventWindow" Height="450" Width="370">
+    <Grid Background="#E8E5FFE4" Width="Auto" Margin="0,0,0,-6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="44*"/>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="TitleInput" HorizontalAlignment="Left" Margin="84,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,12,0,0" TextWrapping="Wrap" Text="Title:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="Time:"/><LineBreak/><Run/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="12,66,0,0" TextWrapping="Wrap" Text="Date:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,3,0,0" TextWrapping="Wrap" Text="Priority:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,33,0,0" TextWrapping="Wrap" Text="Flexibility:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,65,0,0" TextWrapping="Wrap" Text="Location:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,94,0,0" TextWrapping="Wrap" Text="Description:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,48,0,0" TextWrapping="Wrap" Text="Color:" VerticalAlignment="Top" Grid.Row="2"/>
+        <TextBox HorizontalAlignment="Left" Margin="84,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Grid.Row="1"/>
+        <TextBox x:Name="DescriptionInput" HorizontalAlignment="Left" Margin="84,94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Height="75" Grid.RowSpan="2" Grid.Row="1"/>
+        <ComboBox x:Name="TimeList1" HorizontalAlignment="Left" Margin="84,35,0,0" VerticalAlignment="Top" Width="65" Height="21"/>
+        <TextBlock HorizontalAlignment="Left" Margin="208,28,0,0" TextWrapping="Wrap" Text="-" VerticalAlignment="Top" FontSize="22" Height="29"/>
+        <ComboBox x:Name="AMPM1" HorizontalAlignment="Left" Margin="154,35,0,0" VerticalAlignment="Top" Width="48" Height="21"/>
+        <ComboBox x:Name="TimeList2" HorizontalAlignment="Left" Margin="221,35,0,0" VerticalAlignment="Top" Width="63" Height="21"/>
+        <ComboBox x:Name="AMPM2" HorizontalAlignment="Left" Margin="289,35,0,0" VerticalAlignment="Top" Width="49" Height="21"/>
+        <ComboBox x:Name="MonthList" HorizontalAlignment="Left" Margin="84,63,0,0" VerticalAlignment="Top" Width="76" Height="22"/>
+        <ComboBox x:Name="DayList" HorizontalAlignment="Left" Margin="165,61,0,0" VerticalAlignment="Top" Width="52" Height="24"/>
+        <ComboBox x:Name="YearList" HorizontalAlignment="Left" Margin="222,62,0,0" VerticalAlignment="Top" Width="73" Height="24"/>
+        <Rectangle HorizontalAlignment="Left" Height="32" Margin="48,94,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="Okay_Button_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="74,98,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
+        <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,46,0,0" VerticalAlignment="Top" Width="76" Height="20" Grid.Row="2"/>
+        <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,32,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
+            <ComboBox x:Name="DateList_Copy1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" Height="22"/>
+        </ComboBox>
+        <ComboBox x:Name="PriorityList" HorizontalAlignment="Left" Margin="84,1,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
+            <ComboBox x:Name="DateList_Copy3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" Height="22"/>
+        </ComboBox>
+        <Rectangle HorizontalAlignment="Left" Height="32" Margin="196,95,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFE79E8E" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="Delete_Button_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="211,100,0,0" Grid.Row="2" TextWrapping="Wrap" Text="DELETE" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Delete_Button_Click"/>
+    </Grid>
+</Window>

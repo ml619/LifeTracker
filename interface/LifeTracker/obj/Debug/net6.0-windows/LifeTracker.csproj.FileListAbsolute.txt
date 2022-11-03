@@ -44,3 +44,5 @@ C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-wi
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ref\LifeTracker.dll
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.pdb
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.genruntimeconfig.cache
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\EditEventWindow.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\EditEventWindow.baml
