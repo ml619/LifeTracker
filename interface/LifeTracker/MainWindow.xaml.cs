@@ -117,7 +117,7 @@ namespace LifeTracker
             if (hourString1.Substring(0, 1) == "0") { hourString1 = hourString1.Substring(1); }
             if (hourString2.Substring(0, 1) == "0") { hourString2 = hourString2.Substring(1); }
             retNum = Convert.ToInt32(hourString1) * 4;
-            retNum += Convert.ToInt32(hourString2) % 15; //in increments of 15
+            retNum += Convert.ToInt32(hourString2) / 15; //in increments of 15
             return retNum;
         }
 
@@ -195,9 +195,8 @@ namespace LifeTracker
             // Pop up Create Event window.
             EditEventWindow editWin = new EditEventWindow();
 
+            // Retrieve event from list of events
             Event selectedEvent = blockToEvent[(Rectangle)sender];
-
-
 
             // Retrieve event data corresponding to block selected
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time());
@@ -216,7 +215,7 @@ namespace LifeTracker
             editWin.AMPM1.Text = dateTime.ToString("tt");
             editWin.AMPM2.Text = dateTime2.ToString("tt");
             editWin.PriorityList.Text = selectedEvent.GetPriority();
-            //editWin.FlexibilityList.SelectedIndex = selectedEvent.GetFlexibility().ToString();
+            editWin.FlexibilityList.SelectedIndex = selectedEvent.GetFlexibility()-1;
             editWin.MonthList.Text = dateTime.ToString("MMM");
             editWin.DayList.Text = dateTime.ToString("dd");
             editWin.YearList.Text = dateTime.ToString("yyyy");
