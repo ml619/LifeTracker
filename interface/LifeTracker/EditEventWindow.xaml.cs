@@ -71,10 +71,10 @@ namespace LifeTracker
                 YearList.Items.Add(i.ToString());
             }
 
-            ColorList.Items.Add("Red"); ColorList.Items.Add("Blue");
-            ColorList.Items.Add("Green"); ColorList.Items.Add("Yellow");
-            ColorList.Items.Add("Purple"); ColorList.Items.Add("White");
-            ColorList.Items.Add("Brown"); ColorList.Items.Add("Orange");
+            ColorList.Items.Add("LightBlue"); ColorList.Items.Add("LightPink");
+            ColorList.Items.Add("PeachPuff"); ColorList.Items.Add("Silver");
+            ColorList.Items.Add("PaleGoldenrod"); ColorList.Items.Add("BurlyWood");
+            ColorList.Items.Add("Plum"); ColorList.Items.Add("LightGreen");
         }
 
         private void Okay_Button_Click(object sender, RoutedEventArgs e)
