@@ -27,27 +27,35 @@ namespace LifeTracker
 
     public partial class MainWindow : Window
     {
-        public Dictionary<Rectangle, Event> blockToEvent = new Dictionary<Rectangle, Event>();
-        public Dictionary<Rectangle, TextBlock> blockToText = new Dictionary<Rectangle, TextBlock>();
+        // Public variables
+        public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>();
+        public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();
+        public DateTime displayStartOfWeek = DateTime.Today;
+        //current week loaded (TEMPORARILY A BLANK WEEK - FINAL SHOULD LOAD WEEK WITH CURRENT DATE) - DEBUG
+        public static week currentWeek = new week();
+
+        // MainWindow Initialization
         public MainWindow()
         {
             InitializeComponent();
             SelectDisplayWeek.SelectedDate = DateTime.Today;
         }
 
-        public DateTime displayStartOfWeek = DateTime.Today;
-        //current week loaded (TEMPORARILY A BLANK WEEK - FINAL SHOULD LOAD WEEK WITH CURRENT DATE) - DEBUG
-        public static week currentWeek = new week();
-
-
+        // Close Window
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+        // Minimize Window
         private void MinButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
         }
+
+
+        //DISPLAY HANDLING
+
+        // Change Date Displayed (Date Picker)
         private void ArrivalDatePicker_DateChanged(object sender, EventArgs e)
         {
             // Set week with Monday at the start.
@@ -58,69 +66,15 @@ namespace LifeTracker
 
             // Update displayed events to reflect current week.
 
+            // Clear current displayed and stored events
+            ClearDisplayAndStoredEvents();
+
             // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably) - DEBUG
             // ACCESS MIKE'S DATA STUFF
             // GO THROUGH AND DISPLAY THAT DATA ON CALENDAR
 
         }
-
-        private void AddEventToDisplay(Event curEvent)
-        {
-            //Set x margin to correspond to day of week
-            DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
-            int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
-
-            //Set y_margin to correspond to time during day
-            //each 1/4 hour = 8 units
-            int y_margin = 8 * (ConvertTimeToHeightNumber(datetime)) + 11;
-
-            //Create Rectangle
-            Rectangle rec = new Rectangle()
-            {
-                Width = 95, //set width
-                Height = 8 * 4 * curEvent.GetDuration(), 
-                Fill = (SolidColorBrush)new BrushConverter().ConvertFromString(curEvent.GetColor()),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(x_margin, y_margin, 0, 0),
-                Stroke = Brushes.Black,
-                VerticalAlignment = VerticalAlignment.Top,
-                RadiusX = 10,
-                RadiusY = 10,
-            };
-            rec.MouseDown += new MouseButtonEventHandler(EditEventClick);
-
-            //Create Textblock
-            TextBlock txtblk = new TextBlock()
-            {
-                Text = curEvent.GetName(),
-                Margin = new Thickness(x_margin, y_margin, 0, 0),
-                TextAlignment = TextAlignment.Center,
-                Width = 95, //set width
-                Height = 8 * 4 * curEvent.GetDuration(),
-            };
-            txtblk.MouseDown += new MouseButtonEventHandler(EditEventClick);
-
-            Scroll_Area.Children.Add(rec);
-            //Scroll_Area.Children.Add(txtblk); - DEBUG
-
-            // Add rectangle-event pair to dictionary
-            blockToEvent.Add(rec, curEvent);
-            //blockToText.Add(rec,txtblk); - DEBUG
-        }
-
-        private int ConvertTimeToHeightNumber(DateTime inputTime)
-        {
-            int retNum = 0;
-            String timeString = inputTime.ToString("HH:mm");
-            String hourString1 = timeString.Substring(0, 2);
-            String hourString2 = timeString.Substring(3);
-            if (hourString1.Substring(0, 1) == "0") { hourString1 = hourString1.Substring(1); }
-            if (hourString2.Substring(0, 1) == "0") { hourString2 = hourString2.Substring(1); }
-            retNum = Convert.ToInt32(hourString1) * 4;
-            retNum += Convert.ToInt32(hourString2) / 15; //in increments of 15
-            return retNum;
-        }
-
+        // Convert date from date picker to nearest (on left) Monday to identify start of week
         private DateTime FindNearestMonday(DateTime inputDate)
         {
             DateTime retDate = new DateTime();
@@ -133,7 +87,27 @@ namespace LifeTracker
             retDate = inputDate.AddDays(-curWeekDayNum);
             return retDate;
         }
+        // Change Date Displayed (Right Arrow)
+        private void MoveWeekForward(object sender, RoutedEventArgs e)
+        {
+            // Update display and week being accessed.
+            displayStartOfWeek = displayStartOfWeek.AddDays(7);
+            UpdateDisplayDates(displayStartOfWeek);
 
+            // Clear current displayed and stored events
+            ClearDisplayAndStoredEvents();
+        }
+        // Change Date Displayed (Left Arrow)
+        private void MoveWeekBackward(object sender, RoutedEventArgs e)
+        {
+            // Update display and week being accessed.
+            displayStartOfWeek = displayStartOfWeek.AddDays(-7);
+            UpdateDisplayDates(displayStartOfWeek);
+
+            // Clear current displayed and stored events
+            ClearDisplayAndStoredEvents();
+        }
+        // Update Dates shown on display from input star- of-week day
         private void UpdateDisplayDates(DateTime inputDate)
         {
             // Update M-F numbers
@@ -150,7 +124,85 @@ namespace LifeTracker
                 (displayStartOfWeek.AddDays(6)).ToString("MMMM") + " " + (displayStartOfWeek.AddDays(6)).Day;
             yearText.Text = displayStartOfWeek.ToString("yyyy");
         }
+        // Add an Event to the Display
+        private void AddEventToDisplay(Event curEvent)
+        {
+            //Set x margin to correspond to day of week
+            DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
+            int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
 
+            //Set y_margin to correspond to time during day
+            //each 1/4 hour = 8 units
+            int y_margin = 8 * (ConvertTimeToHeightNumber(datetime)) + 11;
+
+            //Create Rectangle
+            Rectangle rec = new Rectangle()
+            {
+                Width = 95, //set width
+                Height = 8 * 4 * curEvent.GetDuration(),
+                Fill = (SolidColorBrush)new BrushConverter().ConvertFromString(curEvent.GetColor()),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(x_margin, y_margin, 0, 0),
+                Stroke = Brushes.Black,
+                RadiusX = 10,
+                RadiusY = 10,
+            };
+            rec.MouseDown += new MouseButtonEventHandler(EditEventClick);
+
+            //Create Textblock
+            TextBlock txtblk = new TextBlock()
+            {
+                Text = curEvent.GetName(),
+                Margin = new Thickness(x_margin, y_margin, 0, 0),
+                TextAlignment = TextAlignment.Center,
+                Width = 95, //set width
+                Height = 8 * 4 * curEvent.GetDuration(),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+            txtblk.MouseDown += new MouseButtonEventHandler(EditEventClick);
+
+            Scroll_Area.Children.Add(rec);
+            Scroll_Area.Children.Add(txtblk);
+
+            // Add rectangle-event pair to dictionary
+            textToEvent.Add(txtblk, curEvent);
+            textToBlock.Add(txtblk, rec);
+        }
+        // Clear Events From Display, Clear Events Stored in Temporary Memory
+        private void ClearDisplayAndStoredEvents()
+        {
+            // Remove textboxes and rectangles from display
+            foreach (KeyValuePair<TextBlock, Event> entry in textToEvent)
+            {
+                Scroll_Area.Children.Remove(entry.Key);
+                Scroll_Area.Children.Remove(textToBlock[entry.Key]);
+                textToEvent.Remove(entry.Key);
+                textToBlock.Remove(entry.Key);
+            }
+            textToEvent = new Dictionary<TextBlock, Event>();
+            textToBlock = new Dictionary<TextBlock, Rectangle>();
+        }
+        //Calculate corresponding height value (display attribute) to duration of Event (stored value)
+        private int ConvertTimeToHeightNumber(DateTime inputTime)
+        {
+            int retNum = 0;
+            String timeString = inputTime.ToString("HH:mm");
+            String hourString1 = timeString.Substring(0, 2);
+            String hourString2 = timeString.Substring(3);
+            if (hourString1.Substring(0, 1) == "0") { hourString1 = hourString1.Substring(1); }
+            if (hourString2.Substring(0, 1) == "0") { hourString2 = hourString2.Substring(1); }
+            retNum = Convert.ToInt32(hourString1) * 4;
+            retNum += Convert.ToInt32(hourString2) / 15; //in increments of 15
+            return retNum;
+        }
+
+
+
+        //EVENT HANDLING (create, edit, delete)
+
+        // Add Event to Calendar from User Input, Update Display if applicable
         private void AddButtonClick(object sender, RoutedEventArgs e)
         {
             // Pop up Create Event window.
@@ -158,8 +210,16 @@ namespace LifeTracker
             createWin.ShowDialog();
 
             // Create event
-            AddEventToDisplay(CreateEvent(ref createWin));
+            Event tempEvent = CreateEvent(ref createWin);
+
+            // Check if event within current week - if so, add to display
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+            DateTime inputDate = dateTimeOffset.DateTime;
+            DateTime startDate = displayStartOfWeek;
+            DateTime endDate = startDate.AddDays(6);
+            if (startDate <= inputDate && inputDate < endDate) AddEventToDisplay(tempEvent);
         }
+        // Create Event object from User Input
         private Event CreateEvent(ref CreateEventWindow createWin)
         {
             Event retEvent = new Event();
@@ -175,6 +235,51 @@ namespace LifeTracker
 
             return retEvent;
         }
+        // Edit Event in Calendar from User Input, Update Display
+        private void EditEventClick(object sender, RoutedEventArgs e)
+        {
+            // Pop up Create Event window.
+            EditEventWindow editWin = new EditEventWindow();
+
+            // Retrieve event from list of events
+            Event selectedEvent = textToEvent[(TextBlock)sender];
+
+            // Retrieve event data corresponding to block selected
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time());
+            DateTime dateTime = dateTimeOffset.DateTime;
+            String dateTimeHour = dateTime.ToString();
+
+            long epochFromDuration = (long)(selectedEvent.GetDuration() * 3600);
+            DateTimeOffset dateTimeOffset2 = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time() + epochFromDuration);
+            DateTime dateTime2 = dateTimeOffset2.DateTime;
+            String dateTimeHour2 = dateTime2.ToString();
+
+            // Set window parameters to old values
+            editWin.TitleInput.Text = selectedEvent.GetName();
+            editWin.TimeList1.Text = dateTime.ToString("hh:mm");
+            editWin.TimeList2.Text = dateTime2.ToString("hh:mm");
+            editWin.AMPM1.Text = dateTime.ToString("tt");
+            editWin.AMPM2.Text = dateTime2.ToString("tt");
+            editWin.PriorityList.Text = selectedEvent.GetPriority();
+            editWin.FlexibilityList.SelectedIndex = selectedEvent.GetFlexibility() - 1;
+            editWin.MonthList.Text = dateTime.ToString("MMM");
+            editWin.DayList.Text = dateTime.ToString("dd");
+            editWin.YearList.Text = dateTime.ToString("yyyy");
+            editWin.ColorList.Text = selectedEvent.GetColor();
+            editWin.DescriptionInput.Text = selectedEvent.GetDescription();
+
+            editWin.ShowDialog();
+
+            // Create new event (unless should be deleted)
+            if (editWin.deleteEventBool == false) AddEventToDisplay(EditEvent(ref editWin));
+
+            // Delete old event
+            Scroll_Area.Children.Remove((TextBlock)sender);
+            Scroll_Area.Children.Remove(textToBlock[(TextBlock)sender]);
+            textToEvent.Remove((TextBlock)sender);
+            textToBlock.Remove((TextBlock)sender);
+        }
+        // Edit Event object from User Input
         private Event EditEvent(ref EditEventWindow editWin)
         {
             Event retEvent = new Event();
@@ -189,50 +294,31 @@ namespace LifeTracker
 
             return retEvent;
         }
-
-        private void EditEventClick(object sender, RoutedEventArgs e)
+        // Convert User Input Date to Epoch Format (New Event Created)
+        private long EpochTimeConversion(ref CreateEventWindow createWin)
         {
-            // Pop up Create Event window.
-            EditEventWindow editWin = new EditEventWindow();
+            //convert from 12 to 24 hour time
+            String time12To24;
+            int temp;
+            if (createWin.AMPM1.Text == "AM") { time12To24 = createWin.TimeList1.Text; }
+            else
+            {
+                int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
+                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
+            }
 
-            // Retrieve event from list of events
-            Event selectedEvent = blockToEvent[(Rectangle)sender];
+            //convert from datetime to epoch time
+            String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
+            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
+            String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
+            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
+            String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
+            DateTime tempDate = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            TimeSpan t = tempDate - new DateTime(1970, 1, 1);
 
-            // Retrieve event data corresponding to block selected
-            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time());
-            DateTime dateTime = dateTimeOffset.DateTime;
-            String dateTimeHour = dateTime.ToString();
-
-            long epochFromDuration = (long)(selectedEvent.GetDuration() * 3600);
-            DateTimeOffset dateTimeOffset2 = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time()+epochFromDuration);
-            DateTime dateTime2 = dateTimeOffset2.DateTime;
-            String dateTimeHour2 = dateTime2.ToString();
-
-            // Set window parameters to old values
-            editWin.TitleInput.Text = selectedEvent.GetName();
-            editWin.TimeList1.Text = dateTime.ToString("hh:mm");
-            editWin.TimeList2.Text = dateTime2.ToString("hh:mm");
-            editWin.AMPM1.Text = dateTime.ToString("tt");
-            editWin.AMPM2.Text = dateTime2.ToString("tt");
-            editWin.PriorityList.Text = selectedEvent.GetPriority();
-            editWin.FlexibilityList.SelectedIndex = selectedEvent.GetFlexibility()-1;
-            editWin.MonthList.Text = dateTime.ToString("MMM");
-            editWin.DayList.Text = dateTime.ToString("dd");
-            editWin.YearList.Text = dateTime.ToString("yyyy");
-            editWin.ColorList.Text = selectedEvent.GetColor();
-            editWin.DescriptionInput.Text = selectedEvent.GetDescription();
-
-            editWin.ShowDialog();
-
-            // Create new event (unless should be deleted)
-            if (editWin.deleteEventBool == false) AddEventToDisplay(EditEvent(ref editWin));
-
-            // Delete old event
-            blockToEvent.Remove((Rectangle)sender);
-            //blockToText.Remove((Rectangle)sender); - DEBUG
-            Scroll_Area.Children.Remove((Rectangle)sender);
+            return (int)t.TotalSeconds;
         }
-
+        // Convert User Input Date to Epoch Format (Edited Pre-existing Event)
         private long EpochTimeConversion(ref EditEventWindow editWin)
         {
             //convert from 12 to 24 hour time
@@ -256,12 +342,12 @@ namespace LifeTracker
 
             return (int)t.TotalSeconds;
         }
-
-        private double HoursDifferenceConversion(ref CreateEventWindow createWin) //SIMPLIFY 12to24 CONVERTER - DEBUG
+        // Find Duration of Event in terms of hours (New Event Created)
+        private double HoursDifferenceConversion(ref CreateEventWindow createWin)
         {
             //---START---
             //convert from 12 to 24 hour time
-            String time12To24;
+            String time12To24; //MAKE THIS SECTION INTO A FUNCTION - IT IS USED IN FUNCTIONS ABOVE TOO - DEBUG
             int temp;
             if (createWin.AMPM1.Text == "AM") { time12To24 = createWin.TimeList1.Text; }
             else
@@ -299,43 +385,7 @@ namespace LifeTracker
             TimeSpan t = tempDate2 - tempDate1;
             return ((double)t.TotalSeconds) / 3600;
         }
-
-        private long EpochTimeConversion(ref CreateEventWindow createWin)
-        {
-            //convert from 12 to 24 hour time
-            String time12To24;
-            int temp;
-            if (createWin.AMPM1.Text == "AM") { time12To24 = createWin.TimeList1.Text; }
-            else
-            {
-                int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
-            }
-
-            //convert from datetime to epoch time
-            String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            TimeSpan t = tempDate - new DateTime(1970, 1, 1);
-
-            return (int)t.TotalSeconds;
-        }
-        private void MoveWeekForward(object sender, RoutedEventArgs e)
-        {
-            // Update display and week being accessed.
-            displayStartOfWeek = displayStartOfWeek.AddDays(7);
-            UpdateDisplayDates(displayStartOfWeek);
-        }
-        private void MoveWeekBackward(object sender, RoutedEventArgs e)
-        {
-            // Update display and week being accessed.
-            displayStartOfWeek = displayStartOfWeek.AddDays(-7);
-            UpdateDisplayDates(displayStartOfWeek);
-        }
-
+        // Find Duration of Event in terms of hours (Edited Pre-existing Event)
         private double HoursDifferenceConversion(ref EditEventWindow editWin) //SIMPLIFY 12to24 CONVERTER - DEBUG
         {
             //---START---
@@ -381,6 +431,8 @@ namespace LifeTracker
     }
 }
 
+
+// Event Classes
 public class Event //description, priority, time, color, flexibility
 {
 
@@ -459,32 +511,6 @@ public class Event //description, priority, time, color, flexibility
     {
         description = Description;
     }
-
-
-    /*public void Equality(Event event1, Event event2)
-    {
-        if (event1.name != event2.name){
-            break;
-        }
-        if (event1.date_time != event2.date_time){
-            break;
-        }
-        if (event1.color != event2.color){
-            break;
-        }
-        if (event1.flexibility != event2.flexibility){
-            break;
-        }
-        if (event1.priority != event2.priority){
-            break;
-        }
-        if (event1.description != event2.description){
-            break;
-        }
-        else {
-            return true;
-        }
-    }*/
 }
 
 class location : Event
@@ -525,6 +551,7 @@ class recurring : Event
     }
 }
 
+// Week Class
 public class week
 {
     protected private static List<Event> mon = new List<Event>(); //lists of events
