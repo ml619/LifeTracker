@@ -130,6 +130,7 @@ namespace LifeTracker
             //Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
             int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
+            if (x_margin < 0) x_margin = 606;
 
             //Set y_margin to correspond to time during day
             //each 1/4 hour = 8 units
@@ -195,6 +196,7 @@ namespace LifeTracker
             if (hourString2.Substring(0, 1) == "0") { hourString2 = hourString2.Substring(1); }
             retNum = Convert.ToInt32(hourString1) * 4;
             retNum += Convert.ToInt32(hourString2) / 15; //in increments of 15
+
             return retNum;
         }
 
@@ -212,11 +214,14 @@ namespace LifeTracker
             // Create event
             Event tempEvent = CreateEvent(ref createWin);
 
+            // Check if end time is before start time - do not create event if so
+            if (tempEvent.GetDuration() < 0) return; 
+
             // Check if event within current week - if so, add to display
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
             DateTime inputDate = dateTimeOffset.DateTime;
             DateTime startDate = displayStartOfWeek;
-            DateTime endDate = startDate.AddDays(6);
+            DateTime endDate = startDate.AddDays(7);
             if (startDate <= inputDate && inputDate < endDate) AddEventToDisplay(tempEvent);
         }
         // Create Event object from User Input
@@ -270,7 +275,7 @@ namespace LifeTracker
 
             editWin.ShowDialog();
 
-            // Create new event (unless should be deleted)
+            // Create new event (unless should be deleted OR duration is negative)
             if (editWin.deleteEventBool == false) AddEventToDisplay(EditEvent(ref editWin));
 
             // Delete old event
@@ -300,12 +305,19 @@ namespace LifeTracker
             //convert from 12 to 24 hour time
             String time12To24;
             int temp;
-            if (createWin.AMPM1.Text == "AM") { time12To24 = createWin.TimeList1.Text; }
+            if (createWin.AMPM1.Text == "AM")
+            {
+                time12To24 = createWin.TimeList1.Text;
+                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
+            }
             else
             {
                 int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
                 time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
             }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
             //convert from datetime to epoch time
             String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
@@ -324,12 +336,19 @@ namespace LifeTracker
             //convert from 12 to 24 hour time
             String time12To24;
             int temp;
-            if (editWin.AMPM1.Text == "AM") { time12To24 = editWin.TimeList1.Text; }
+            if (editWin.AMPM1.Text == "AM")
+            {
+                time12To24 = editWin.TimeList1.Text;
+                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
+            }
             else
             {
                 int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
                 time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
             }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
             //convert from datetime to epoch time
             String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
@@ -349,12 +368,19 @@ namespace LifeTracker
             //convert from 12 to 24 hour time
             String time12To24; //MAKE THIS SECTION INTO A FUNCTION - IT IS USED IN FUNCTIONS ABOVE TOO - DEBUG
             int temp;
-            if (createWin.AMPM1.Text == "AM") { time12To24 = createWin.TimeList1.Text; }
+            if (createWin.AMPM1.Text == "AM")
+            { 
+                time12To24 = createWin.TimeList1.Text;
+                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
+            }
             else
             {
                 int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
                 time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
             }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
             //convert from datetime to epoch time
             String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
@@ -366,12 +392,19 @@ namespace LifeTracker
 
             //---END---
             //convert from 12 to 24 hour time
-            if (createWin.AMPM2.Text == "AM") { time12To24 = createWin.TimeList2.Text; }
+            if (createWin.AMPM2.Text == "AM")
+            {
+                time12To24 = createWin.TimeList2.Text;
+                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList2.Text.Substring(2);
+            }
             else
             {
                 int.TryParse(createWin.TimeList2.Text.Substring(0, 2), out temp);
                 time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList2.Text.Substring(2);
             }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
             //convert from datetime to epoch time
             MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
@@ -392,12 +425,19 @@ namespace LifeTracker
             //convert from 12 to 24 hour time
             String time12To24;
             int temp;
-            if (editWin.AMPM1.Text == "AM") { time12To24 = editWin.TimeList1.Text; }
+            if (editWin.AMPM1.Text == "AM")
+            {
+                time12To24 = editWin.TimeList1.Text;
+                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
+            }
             else
             {
                 int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
                 time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
             }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
             //convert from datetime to epoch time
             String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
@@ -415,6 +455,9 @@ namespace LifeTracker
                 int.TryParse(editWin.TimeList2.Text.Substring(0, 2), out temp);
                 time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList2.Text.Substring(2);
             }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
             //convert from datetime to epoch time
             MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
