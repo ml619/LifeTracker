@@ -32,7 +32,7 @@ namespace LifeTracker
         public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();
         public DateTime displayStartOfWeek = DateTime.Today;
         //current week loaded (TEMPORARILY A BLANK WEEK - FINAL SHOULD LOAD WEEK WITH CURRENT DATE) - DEBUG
-        public static week currentWeek = new week();
+        public static Week currentWeek = new Week();
 
         // MainWindow Initialization
         public MainWindow()
@@ -215,7 +215,7 @@ namespace LifeTracker
             Event tempEvent = CreateEvent(ref createWin);
 
             // Check if end time is before start time - do not create event if so
-            if (tempEvent.GetDuration() < 0) return; 
+            if (tempEvent.GetDuration() < 0) return;
 
             // Check if event within current week - if so, add to display
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
@@ -369,7 +369,7 @@ namespace LifeTracker
             String time12To24; //MAKE THIS SECTION INTO A FUNCTION - IT IS USED IN FUNCTIONS ABOVE TOO - DEBUG
             int temp;
             if (createWin.AMPM1.Text == "AM")
-            { 
+            {
                 time12To24 = createWin.TimeList1.Text;
                 if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
             }
@@ -595,7 +595,7 @@ class recurring : Event
 }
 
 // Week Class
-public class week
+public class Week
 {
     protected private static List<Event> mon = new List<Event>(); //lists of events
     protected private static List<Event> tue = new List<Event>();
@@ -606,19 +606,89 @@ public class week
     protected private static List<Event> sun = new List<Event>();
 
     protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
+    protected private long date;
+
+    public long GetDate() 
+    {
+        return date;
+    }
+
+    public void SetDate(long inputDate)
+    {
+        date = inputDate;
+    }
 
     public List<List<Event>> GetWeek()
     {
         return a_week;
     }
 
-    public void Add(Event event1, int day)
+    public void AddEvent(Event event1, int day)
     {
         a_week[day].Add(event1);
     }
 
-    public void Delete(Event event1, int day)
+    public void DeleteEvent(Event event1, int day)
     {
         a_week[day].Remove(event1);
     }
+}
+
+
+// Calendar Class
+
+class Calendar
+{
+    private Dictionary<long, Week> weeks;
+
+    Week GetWeek(long key)
+    {
+        return weeks[key];
+    }
+
+    public void AddWeek(Week week)
+    {
+        weeks.Add(week.GetDate(), week); //DEBUG - not an actual function in "Week"
+    }
+
+    public void RemoveWeek(long key)
+    {
+        weeks.Remove(key);
+    }
+
+    public void SetWeek(long key, Week week)
+    {
+        weeks[key] = week;
+    }
+
+    public void AddEvent(Event inputEvent, long date)
+    {
+        if (weeks.ContainsKey(date))
+        {
+            weeks[date].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        }
+        else
+        {
+            Week newWeek = new Week();
+            newWeek.AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+            weeks[date] = newWeek;
+        }
+    }
+
+    public void DeleteEvent(Event inputEvent)
+    {
+        weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+    }
+
+    public void AddEvent(Event inputEvent)
+    {
+        weeks[inputEvent.GetDate_Time()].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+    }
+
+    private int EpochToWeekday(long inputDate)
+    {
+        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
+        return (int)(dateTimeOffset.DateTime).DayOfWeek;
+    }
+
 }
