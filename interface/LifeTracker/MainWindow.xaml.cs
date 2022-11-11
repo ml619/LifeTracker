@@ -302,117 +302,26 @@ namespace LifeTracker
         // Convert User Input Date to Epoch Format (New Event Created)
         private long EpochTimeConversion(ref CreateEventWindow createWin)
         {
-            //convert from 12 to 24 hour time
-            String time12To24;
-            int temp;
-            if (createWin.AMPM1.Text == "AM")
-            {
-                time12To24 = createWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
-            }
+            DateTime tempDate = UserInputToDateTime(ref createWin, 1);
 
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
-
             return (int)t.TotalSeconds;
         }
         // Convert User Input Date to Epoch Format (Edited Pre-existing Event)
         private long EpochTimeConversion(ref EditEventWindow editWin)
         {
-            //convert from 12 to 24 hour time
-            String time12To24;
-            int temp;
-            if (editWin.AMPM1.Text == "AM")
-            {
-                time12To24 = editWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
-            }
+            DateTime tempDate = UserInputToDateTime(ref editWin, 1);
 
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
-            if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
-            if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
-
             return (int)t.TotalSeconds;
         }
         // Find Duration of Event in terms of hours (New Event Created)
         private double HoursDifferenceConversion(ref CreateEventWindow createWin)
         {
-            //---START---
-            //convert from 12 to 24 hour time
-            String time12To24; //MAKE THIS SECTION INTO A FUNCTION - IT IS USED IN FUNCTIONS ABOVE TOO - DEBUG
-            int temp;
-            if (createWin.AMPM1.Text == "AM")
-            {
-                time12To24 = createWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate1 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-
-            //---END---
-            //convert from 12 to 24 hour time
-            if (createWin.AMPM2.Text == "AM")
-            {
-                time12To24 = createWin.TimeList2.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList2.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(createWin.TimeList2.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList2.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate2 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime tempDate1 = UserInputToDateTime(ref createWin, 1);
+            DateTime tempDate2 = UserInputToDateTime(ref createWin, 2);
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
@@ -421,55 +330,106 @@ namespace LifeTracker
         // Find Duration of Event in terms of hours (Edited Pre-existing Event)
         private double HoursDifferenceConversion(ref EditEventWindow editWin) //SIMPLIFY 12to24 CONVERTER - DEBUG
         {
-            //---START---
-            //convert from 12 to 24 hour time
+            DateTime tempDate1 = UserInputToDateTime(ref editWin, 1);
+            DateTime tempDate2 = UserInputToDateTime(ref editWin, 2);
+
+            //find difference between end and start, convert from seconds to hours
+            TimeSpan t = tempDate2 - tempDate1;
+            return ((double)t.TotalSeconds) / 3600;
+        }
+
+        private DateTime UserInputToDateTime(ref CreateEventWindow createWin, int startOrEnd)
+        {
+            {
+                //convert from 12 to 24 hour time (based on either start or end time)
+                String time12To24;
+                int temp;
+                if (startOrEnd == 1)
+                {
+                    if (createWin.AMPM1.Text == "AM")
+                    {
+                        time12To24 = createWin.TimeList1.Text;
+                        if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
+                    }
+                    else
+                    {
+                        int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
+                        time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
+                    }
+                }
+                else
+                {
+                    if (createWin.AMPM2.Text == "AM")
+                    {
+                        time12To24 = createWin.TimeList2.Text;
+                        if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList2.Text.Substring(2);
+                    }
+                    else
+                    {
+                        int.TryParse(createWin.TimeList2.Text.Substring(0, 2), out temp);
+                        time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList2.Text.Substring(2);
+                    }
+                }
+
+                //convert 0 to 12 in hour
+                if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
+
+                //convert user input to date
+                String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
+                if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
+                String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
+                if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
+                String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
+
+                //return final date
+                return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
+        private DateTime UserInputToDateTime(ref EditEventWindow editWin, int startOrEnd)
+        {
+            //convert from 12 to 24 hour time (based on either start or end time)
             String time12To24;
             int temp;
-            if (editWin.AMPM1.Text == "AM")
+            if (startOrEnd == 1)
             {
-                time12To24 = editWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
+                if (editWin.AMPM1.Text == "AM")
+                {
+                    time12To24 = editWin.TimeList1.Text;
+                    if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
+                }
+                else
+                {
+                    int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
+                    time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
+                }
             }
             else
             {
-                int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
+                if (editWin.AMPM2.Text == "AM")
+                {
+                    time12To24 = editWin.TimeList2.Text;
+                    if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList2.Text.Substring(2);
+                }
+                else
+                {
+                    int.TryParse(editWin.TimeList2.Text.Substring(0, 2), out temp);
+                    time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList2.Text.Substring(2);
+                }
             }
 
             //convert 0 to 12 in hour
             if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
-            //convert from datetime to epoch time
+            //convert user input to date
             String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
             if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
             String DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
             if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
             String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate1 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
-            //---END---
-            //convert from 12 to 24 hour time
-            if (editWin.AMPM2.Text == "AM") { time12To24 = editWin.TimeList2.Text; }
-            else
-            {
-                int.TryParse(editWin.TimeList2.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList2.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
-            if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
-            DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
-            if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
-            dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate2 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-
-            //find difference between end and start, convert from seconds to hours
-            TimeSpan t = tempDate2 - tempDate1;
-            return ((double)t.TotalSeconds) / 3600;
+            //return final date
+            return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }
@@ -523,7 +483,7 @@ public class Event //description, priority, time, color, flexibility
     }
 
 
-    protected private double duration; //IN TERMS OF HOURS
+    protected private double duration; //in terms of hours
     public double GetDuration()
     {
         return duration;
@@ -608,7 +568,7 @@ public class Week
     protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
     protected private long date;
 
-    public long GetDate() 
+    public long GetDate()
     {
         return date;
     }
