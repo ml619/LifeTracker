@@ -1,0 +1,18 @@
+﻿<Window x:Class="LifeTracker.ReminderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LifeTracker"
+        mc:Ignorable="d"
+        Title="ReminderWindow" Height="300" Width="400">
+    <Grid Height="Auto" Width="Auto" Background="#E8E5FFE4">
+        <TextBlock HorizontalAlignment="Center" Margin="0,31,0,0" TextWrapping="Wrap" Text="30 Minutes Until:" VerticalAlignment="Top" FontStyle="Italic" FontSize="14"/>
+        <TextBlock x:Name="EventName" HorizontalAlignment="Center" Margin="0,71,0,0" TextWrapping="Wrap" Text="event_name_here" VerticalAlignment="Top" FontWeight="Bold" FontSize="30"/>
+        <TextBlock x:Name="EventStart" HorizontalAlignment="Center" TextWrapping="Wrap" Text="time here" VerticalAlignment="Center" FontSize="16"/>
+        <TextBlock x:Name="EventLocation" HorizontalAlignment="Center" TextWrapping="Wrap" Text="set to ' ' if none" VerticalAlignment="Top" FontSize="16" Margin="0,174,0,0"/>
+        <Rectangle HorizontalAlignment="Left" Height="32" Margin="152,229,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" MouseLeftButtonDown="Okay_Button_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="178,233,0,0" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
+
+    </Grid>
+</Window>

@@ -13,6 +13,9 @@
     <Compile Update="EditEventWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="ReminderWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="EditEventWindow.xaml">
@@ -22,6 +25,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="CreateEventWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ReminderWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
