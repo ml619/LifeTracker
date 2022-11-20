@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\App.xaml
-3-1458711784
+4-479875052
 
-7-257969669
+8-563573856
 194-164764702
-CreateEventWindow.xaml;EditEventWindow.xaml;MainWindow.xaml;
+CreateEventWindow.xaml;EditEventWindow.xaml;MainWindow.xaml;ReminderWindow.xaml;
 
 True
 

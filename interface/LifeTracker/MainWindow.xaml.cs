@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Timers;
+
 
 namespace LifeTracker
 {
@@ -25,14 +27,18 @@ namespace LifeTracker
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
+
     public partial class MainWindow : Window
     {
         // Public variables
-        public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>();
-        public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();
+        public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>(); //DEBUG - get rid of these
+        public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();  //DEBUG - get rid of these
+
+        public Dictionary<Event, FullEventHub> fullEventHubList = new Dictionary<Event, FullEventHub>();
+         
+
         public DateTime displayStartOfWeek = DateTime.Today;
-        //current week loaded (TEMPORARILY A BLANK WEEK - FINAL SHOULD LOAD WEEK WITH CURRENT DATE) - DEBUG
-        public static Week currentWeek = new Week();
+        public static Week currentWeek = new Week(); //MAKE IT SO IT STARTS WITH CURRENT WEEK INSTEAD OF BLANK - DEBUG
 
         // MainWindow Initialization
         public MainWindow()
@@ -69,6 +75,8 @@ namespace LifeTracker
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
 
+
+
             // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably) - DEBUG
             // ACCESS MIKE'S DATA STUFF
             // GO THROUGH AND DISPLAY THAT DATA ON CALENDAR
@@ -79,8 +87,7 @@ namespace LifeTracker
         {
             DateTime retDate = new DateTime();
 
-            // Find nearest Monday (going backwards in time), use result to find
-            //  corresponding week in stored data.
+            // Find nearest Monday (going backwards in time), use result to find corresponding week in stored data.
             // Day of week is found numerically - Monday = 0, Sunday = 6
             // Track backwards until reach Monday
             int curWeekDayNum = (int)(SelectDisplayWeek.SelectedDate.Value.DayOfWeek + 6) % 7;
@@ -167,23 +174,19 @@ namespace LifeTracker
             Scroll_Area.Children.Add(rec);
             Scroll_Area.Children.Add(txtblk);
 
-            // Add rectangle-event pair to dictionary
-            textToEvent.Add(txtblk, curEvent);
-            textToBlock.Add(txtblk, rec);
+            // Add data to FullEventHub dictionary
+            FullEventHub newEventHub = new FullEventHub(curEvent, rec, txtblk);
+            fullEventHubList.Add(curEvent,newEventHub);
         }
         // Clear Events From Display, Clear Events Stored in Temporary Memory
         private void ClearDisplayAndStoredEvents()
         {
             // Remove textboxes and rectangles from display
-            foreach (KeyValuePair<TextBlock, Event> entry in textToEvent)
+            foreach (KeyValuePair<Event, FullEventHub> entry in fullEventHubList)
             {
-                Scroll_Area.Children.Remove(entry.Key);
-                Scroll_Area.Children.Remove(textToBlock[entry.Key]);
-                textToEvent.Remove(entry.Key);
-                textToBlock.Remove(entry.Key);
+                entry.DeleteContents();
             }
-            textToEvent = new Dictionary<TextBlock, Event>();
-            textToBlock = new Dictionary<TextBlock, Rectangle>();
+            fullEventHubList = new Dictionary<Event, FullEventHub>;
         }
         //Calculate corresponding height value (display attribute) to duration of Event (stored value)
         private int ConvertTimeToHeightNumber(DateTime inputTime)
@@ -432,223 +435,274 @@ namespace LifeTracker
             return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
         }
     }
-}
 
 
-// Event Classes
-public class Event //description, priority, time, color, flexibility
-{
+    //CLASSES
 
-    protected private string name; // name of event
-    public string GetName()
+
+    // FullEvent Class
+    public class FullEventHub
     {
-        return name;
-    }
-    public void SetName(string Name)
-    {
-        name = Name;
-    }
-
-
-    protected private long date_time; //date and time in epoch
-    public long GetDate_Time()
-    {
-        return date_time;
-    }
-    public void SetDate_Time(long Date_Time)
-    {
-        date_time = Date_Time;
-    }
-
-
-    protected private int flexibility;
-    public int GetFlexibility()
-    {
-        return flexibility;
-    }
-    public void SetFlexibility(int Flexibility)
-    {
-        flexibility = Flexibility;
-    }
-
-
-    protected private string color; // color of event
-    public string GetColor()
-    {
-        return color;
-    }
-    public void SetColor(string Color)
-    {
-        color = Color;
-    }
-
-
-    protected private double duration; //in terms of hours
-    public double GetDuration()
-    {
-        return duration;
-    }
-    public void SetDuration(double Duration)
-    {
-        duration = Duration;
-    }
-
-
-    protected private string priority;
-    public string GetPriority()
-    {
-        return priority;
-    }
-    public void SetPriority(string Priority)
-    {
-        priority = Priority;
-    }
-
-
-    protected private string description; //short description of acitiviy 
-    public string GetDescription()
-    {
-        return description;
-    }
-    public void SetDescription(string Description)
-    {
-        description = Description;
-    }
-}
-
-class location : Event
-{
-    protected private string eventname; // name of location
-    public string GetEventName()
-    {
-        return eventname;
-    }
-    public void SetEventName(string EventName)
-    {
-        eventname = EventName;
-    }
-
-}
-
-class recurring : Event
-{
-    private protected long end_date; // end of recurring 
-    public long GetEnd_Date()
-    {
-        return end_date;
-    }
-    public void SetEnd_Date(long End_Date)
-    {
-        end_date = End_Date;
-    }
-
-
-    private protected int step; //how often 
-    public int GetStep()
-    {
-        return step;
-    }
-    public void Step(int Step)
-    {
-        step = Step;
-    }
-}
-
-// Week Class
-public class Week
-{
-    protected private static List<Event> mon = new List<Event>(); //lists of events
-    protected private static List<Event> tue = new List<Event>();
-    protected private static List<Event> wed = new List<Event>();
-    protected private static List<Event> thu = new List<Event>();
-    protected private static List<Event> fri = new List<Event>();
-    protected private static List<Event> sat = new List<Event>();
-    protected private static List<Event> sun = new List<Event>();
-
-    protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
-    protected private long date;
-
-    public long GetDate()
-    {
-        return date;
-    }
-
-    public void SetDate(long inputDate)
-    {
-        date = inputDate;
-    }
-
-    public List<List<Event>> GetWeek()
-    {
-        return a_week;
-    }
-
-    public void AddEvent(Event event1, int day)
-    {
-        a_week[day].Add(event1);
-    }
-
-    public void DeleteEvent(Event event1, int day)
-    {
-        a_week[day].Remove(event1);
-    }
-}
-
-
-// Calendar Class
-
-class Calendar
-{
-    private Dictionary<long, Week> weeks;
-
-    Week GetWeek(long key)
-    {
-        return weeks[key];
-    }
-
-    public void AddWeek(Week week)
-    {
-        weeks.Add(week.GetDate(), week); //DEBUG - not an actual function in "Week"
-    }
-
-    public void RemoveWeek(long key)
-    {
-        weeks.Remove(key);
-    }
-
-    public void SetWeek(long key, Week week)
-    {
-        weeks[key] = week;
-    }
-
-    public void AddEvent(Event inputEvent, long date)
-    {
-        if (weeks.ContainsKey(date))
+        protected private Event correspondingEvent;
+        protected private TextBlock textblock;
+        protected private Rectangle rectangle;
+        protected private Timer timer;
+        
+        //constructor
+        public FullEventHub(Event inputEvent, Rectangle rec, TextBlock txtblk)
         {
-            weeks[date].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+            correspondingEvent = inputEvent;
+            textblock = txtblk;
+            rectangle = rec;
+            UpdateTimer();
         }
-        else
+
+        public TextBlock GetTextBlock()
         {
-            Week newWeek = new Week();
-            newWeek.AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
-            weeks[date] = newWeek;
+            return textblock;
+        }
+
+        public void UpdateTimer()
+        {
+            // Calculate ms between current time and start time (account for 30 minutes beforehand)
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(correspondingEvent.GetDate_Time());
+            DateTime date2 = (dateTimeOffset.DateTime).AddMinutes(-30);
+            DateTime date1 = DateTime.Now;
+            TimeSpan ts = date2 - date1;
+            int ms = (int)ts.TotalMilliseconds;
+
+            // Create a timer with interval in ms (edge case check if time is negative)
+            if (ms > 0)
+            {
+                timer = new Timer(ms);
+                timer.Elapsed += OnTimedEvent;
+            }
+            else timer = null;
+
+        }
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            // Put up pop-up window
+            ReminderWindow reminder = new ReminderWindow();
         }
     }
 
-    public void DeleteEvent(Event inputEvent)
+
+    // Event Classes
+    public class Event //description, priority, time, color, flexibility
     {
-        weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+
+        protected private string name; // name of event
+        public string GetName()
+        {
+            return name;
+        }
+        public void SetName(string Name)
+        {
+            name = Name;
+        }
+
+
+        protected private long date_time; //date and time in epoch
+        public long GetDate_Time()
+        {
+            return date_time;
+        }
+        public void SetDate_Time(long Date_Time)
+        {
+            date_time = Date_Time;
+        }
+
+
+        protected private int flexibility;
+        public int GetFlexibility()
+        {
+            return flexibility;
+        }
+        public void SetFlexibility(int Flexibility)
+        {
+            flexibility = Flexibility;
+        }
+
+
+        protected private string color; // color of event
+        public string GetColor()
+        {
+            return color;
+        }
+        public void SetColor(string Color)
+        {
+            color = Color;
+        }
+
+
+        protected private double duration; //in terms of hours
+        public double GetDuration()
+        {
+            return duration;
+        }
+        public void SetDuration(double Duration)
+        {
+            duration = Duration;
+        }
+
+
+        protected private string priority;
+        public string GetPriority()
+        {
+            return priority;
+        }
+        public void SetPriority(string Priority)
+        {
+            priority = Priority;
+        }
+
+
+        protected private string description; //short description of acitiviy 
+        public string GetDescription()
+        {
+            return description;
+        }
+        public void SetDescription(string Description)
+        {
+            description = Description;
+        }
     }
 
-    public void AddEvent(Event inputEvent)
+    class location : Event
     {
-        weeks[inputEvent.GetDate_Time()].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        protected private string eventname; // name of location
+        public string GetEventName()
+        {
+            return eventname;
+        }
+        public void SetEventName(string EventName)
+        {
+            eventname = EventName;
+        }
+
     }
 
-    private int EpochToWeekday(long inputDate)
+    class recurring : Event
     {
-        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
-        return (int)(dateTimeOffset.DateTime).DayOfWeek;
+        private protected long end_date; // end of recurring 
+        public long GetEnd_Date()
+        {
+            return end_date;
+        }
+        public void SetEnd_Date(long End_Date)
+        {
+            end_date = End_Date;
+        }
+
+
+        private protected int step; //how often 
+        public int GetStep()
+        {
+            return step;
+        }
+        public void Step(int Step)
+        {
+            step = Step;
+        }
     }
 
+    // Week Class
+    public class Week
+    {
+        protected private static List<Event> mon = new List<Event>(); //lists of events
+        protected private static List<Event> tue = new List<Event>();
+        protected private static List<Event> wed = new List<Event>();
+        protected private static List<Event> thu = new List<Event>();
+        protected private static List<Event> fri = new List<Event>();
+        protected private static List<Event> sat = new List<Event>();
+        protected private static List<Event> sun = new List<Event>();
+
+        protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
+        protected private long date;
+
+        public long GetDate()
+        {
+            return date;
+        }
+
+        public void SetDate(long inputDate)
+        {
+            date = inputDate;
+        }
+
+        public List<List<Event>> GetWeek()
+        {
+            return a_week;
+        }
+
+        public void AddEvent(Event event1, int day)
+        {
+            a_week[day].Add(event1);
+        }
+
+        public void DeleteEvent(Event event1, int day)
+        {
+            a_week[day].Remove(event1);
+        }
+    }
+
+
+    // Calendar Class
+
+    class Calendar
+    {
+        private Dictionary<long, Week> weeks;
+
+        Week GetWeek(long key)
+        {
+            return weeks[key];
+        }
+
+        public void AddWeek(Week week)
+        {
+            weeks.Add(week.GetDate(), week); //DEBUG - not an actual function in "Week"
+        }
+
+        public void RemoveWeek(long key)
+        {
+            weeks.Remove(key);
+        }
+
+        public void SetWeek(long key, Week week)
+        {
+            weeks[key] = week;
+        }
+
+        public void AddEvent(Event inputEvent, long date)
+        {
+            if (weeks.ContainsKey(date))
+            {
+                weeks[date].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+            }
+            else
+            {
+                Week newWeek = new Week();
+                newWeek.AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+                weeks[date] = newWeek;
+            }
+        }
+
+        public void DeleteEvent(Event inputEvent)
+        {
+            weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        }
+
+        public void AddEvent(Event inputEvent)
+        {
+            weeks[inputEvent.GetDate_Time()].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        }
+
+        private int EpochToWeekday(long inputDate)
+        {
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
+            return (int)(dateTimeOffset.DateTime).DayOfWeek;
+        }
+
+    }
 }
