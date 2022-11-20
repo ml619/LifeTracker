@@ -27,5 +27,10 @@ namespace LifeTracker
             System.Media.SoundPlayer player = new System.Media.SoundPlayer(@"Meeting Reminder.mp3");
             player.Play();
         }
+        private void Okay_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Close create window.
+            this.Close();
+        }
     }
 }

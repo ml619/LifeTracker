@@ -31,11 +31,9 @@ namespace LifeTracker
     public partial class MainWindow : Window
     {
         // Public variables
-        public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>(); //DEBUG - get rid of these
-        public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();  //DEBUG - get rid of these
-
-        public Dictionary<Event, FullEventHub> fullEventHubList = new Dictionary<Event, FullEventHub>();
-         
+        public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>();
+        public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();
+        public Dictionary<TextBlock, Timer> textToTimer = new Dictionary<TextBlock, Timer>();
 
         public DateTime displayStartOfWeek = DateTime.Today;
         public static Week currentWeek = new Week(); //MAKE IT SO IT STARTS WITH CURRENT WEEK INSTEAD OF BLANK - DEBUG
@@ -174,19 +172,53 @@ namespace LifeTracker
             Scroll_Area.Children.Add(rec);
             Scroll_Area.Children.Add(txtblk);
 
-            // Add data to FullEventHub dictionary
-            FullEventHub newEventHub = new FullEventHub(curEvent, rec, txtblk);
-            fullEventHubList.Add(curEvent,newEventHub);
+            //Create Timer
+            // Calculate ms between current time and start time (account for 30 minutes beforehand)
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+            DateTime date2 = (dateTimeOffset.DateTime).AddMinutes(-30);
+            DateTime date1 = DateTime.Now;
+            TimeSpan ts = date2 - date1;
+            int ms = (int)ts.TotalMilliseconds;
+
+            // Create a timer with interval in ms (edge case check if time is negative)
+            Timer timer = new Timer();
+            if (ms > 0)
+            {
+                timer = new Timer(ms);
+                timer.Elapsed += (sender, e) => OnTimedEvent(sender, e, curEvent);
+                timer.Enabled = true;
+            }
+            else timer = null;
+
+            // Add rectangle-event pair to dictionary
+            textToEvent.Add(txtblk, curEvent);
+            textToBlock.Add(txtblk, rec);
+            textToTimer.Add(txtblk, timer);
+        }
+        // Open reminder pop-up when timer event occurs
+        private void OnTimedEvent(Object source, ElapsedEventArgs e, Event curEvent)
+        {
+            // Put up pop-up window
+            ReminderWindow reminder = new ReminderWindow();
+            reminder.EventName.Text = curEvent.GetName();
+            reminder.EventStart.Text = curEvent.GetDate_Time().ToString("HH:mm");
+            reminder.Show();
         }
         // Clear Events From Display, Clear Events Stored in Temporary Memory
         private void ClearDisplayAndStoredEvents()
         {
             // Remove textboxes and rectangles from display
-            foreach (KeyValuePair<Event, FullEventHub> entry in fullEventHubList)
+            foreach (KeyValuePair<TextBlock, Event> entry in textToEvent)
             {
-                entry.DeleteContents();
+                Scroll_Area.Children.Remove(entry.Key);
+                Scroll_Area.Children.Remove(textToBlock[entry.Key]);
+                textToEvent.Remove(entry.Key);
+                textToBlock.Remove(entry.Key);
+                textToTimer.Remove(entry.Key);
             }
-            fullEventHubList = new Dictionary<Event, FullEventHub>;
+            textToEvent = new Dictionary<TextBlock, Event>();
+            textToBlock = new Dictionary<TextBlock, Rectangle>();
+            textToTimer = new Dictionary<TextBlock, Timer>();
         }
         //Calculate corresponding height value (display attribute) to duration of Event (stored value)
         private int ConvertTimeToHeightNumber(DateTime inputTime)
@@ -240,7 +272,6 @@ namespace LifeTracker
             retEvent.SetFlexibility(createWin.FlexibilityList.SelectedIndex + 1);
             retEvent.SetPriority(createWin.PriorityList.Text);
             retEvent.SetDescription(createWin.DescriptionInput.Text);
-
             return retEvent;
         }
         // Edit Event in Calendar from User Input, Update Display
@@ -438,55 +469,6 @@ namespace LifeTracker
 
 
     //CLASSES
-
-
-    // FullEvent Class
-    public class FullEventHub
-    {
-        protected private Event correspondingEvent;
-        protected private TextBlock textblock;
-        protected private Rectangle rectangle;
-        protected private Timer timer;
-        
-        //constructor
-        public FullEventHub(Event inputEvent, Rectangle rec, TextBlock txtblk)
-        {
-            correspondingEvent = inputEvent;
-            textblock = txtblk;
-            rectangle = rec;
-            UpdateTimer();
-        }
-
-        public TextBlock GetTextBlock()
-        {
-            return textblock;
-        }
-
-        public void UpdateTimer()
-        {
-            // Calculate ms between current time and start time (account for 30 minutes beforehand)
-            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(correspondingEvent.GetDate_Time());
-            DateTime date2 = (dateTimeOffset.DateTime).AddMinutes(-30);
-            DateTime date1 = DateTime.Now;
-            TimeSpan ts = date2 - date1;
-            int ms = (int)ts.TotalMilliseconds;
-
-            // Create a timer with interval in ms (edge case check if time is negative)
-            if (ms > 0)
-            {
-                timer = new Timer(ms);
-                timer.Elapsed += OnTimedEvent;
-            }
-            else timer = null;
-
-        }
-        private void OnTimedEvent(Object source, ElapsedEventArgs e)
-        {
-            // Put up pop-up window
-            ReminderWindow reminder = new ReminderWindow();
-        }
-    }
-
 
     // Event Classes
     public class Event //description, priority, time, color, flexibility
@@ -703,6 +685,5 @@ namespace LifeTracker
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
         }
-
     }
 }
