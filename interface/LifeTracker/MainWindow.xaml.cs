@@ -685,5 +685,25 @@ namespace LifeTracker
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
         }
+        
+        public void SaveXML(String filePath)  
+        {  
+        
+            System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calender));  
+            System.IO.FileStream file = System.IO.File.Create(filePath);  
+            saver.Serialize(file, this);  
+            file.Close();  
+        }  
+
+
+        public void LoadXML(String filePath)  
+        {  
+
+            System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calander));  
+            System.IO.StreamReader file = new System.IO.StreamReader(filePath);  
+            this = (Calander)reader.Deserialize(file);  
+            file.Close();  
+
+        } 
     }
 }
