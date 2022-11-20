@@ -57,4 +57,27 @@ class Calendar
         return (int)(dateTimeOffset.DateTime).DayOfWeek;
     }
 
+    public Event reschedule(Event event, Week week)
+    {
+        //my fancy algorithm
+        int score;
+
+        int dateScore = (event.GetDate_Time() * event.GetPriority());
+        
+        int priorityScore;
+        if(event.GetPriority == "LOW")
+            priorityScore = 3;
+        else if(event.GetPriority == "MED")
+            priorityScore = 2;
+        else
+            priorityScore = 1;
+
+        priorityScore = priorityScore/100;
+
+        int flexScore = event.GetFlexibility;
+
+        int locationScore = 0; //complete later!
+
+        score = dateScore + priorityScore + flexScore + locationScore;
+    }
 }
