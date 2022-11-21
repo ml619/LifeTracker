@@ -324,6 +324,21 @@ namespace LifeTracker
                 //Add event to display
                 AddEventToDisplay(tempEvent);
             }
+            else
+            {
+                //Look for correct week to add event to, do NOT add to current display
+                //dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                DateTime dateTime = dateTimeOffset.DateTime;
+
+                int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
+
+                int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
+                DateTime adjustedDate = dateTimeOffset.DateTime;
+
+                long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds;
+                calendar.AddEvent(tempEvent, mondayEpoch);
+            }
         }
         // Create Event object from User Input
         private Event CreateEvent(ref CreateEventWindow createWin)
@@ -753,7 +768,7 @@ namespace LifeTracker
             weeks[key] = week;
         }
 
-        public void AddEvent(Event inputEvent, long date)
+        public void AddEvent(Event inputEvent, long date) //event, corresponding start-of-week in epoch format
         {
             if (weeks.ContainsKey(date))
             {
