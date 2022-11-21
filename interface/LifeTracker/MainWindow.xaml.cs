@@ -875,17 +875,6 @@ namespace LifeTracker
             a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
         }
 
-        public void ClearWeek()
-        {
-            mon = new List<Event>(); //lists of events
-            tue = new List<Event>();
-            wed = new List<Event>();
-            thu = new List<Event>();
-            fri = new List<Event>();
-            sat = new List<Event>();
-            sun = new List<Event>();
-        }
-
         public long GetDate()
         {
             return date;
