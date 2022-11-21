@@ -13,21 +13,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Timers;
+using System.IO;
 
 
 namespace LifeTracker
 {
-    // ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None"
-
-
-
-
-
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-
-
     public partial class MainWindow : Window
     {
         // Public variables
@@ -36,13 +26,24 @@ namespace LifeTracker
         public Dictionary<TextBlock, Timer> textToTimer = new Dictionary<TextBlock, Timer>();
 
         public DateTime displayStartOfWeek = DateTime.Today;
-        public static Week currentWeek = new Week(); //MAKE IT SO IT STARTS WITH CURRENT WEEK INSTEAD OF BLANK - DEBUG
+        public Week currentWeek = new Week();
+        public Calendar calendar = new Calendar();
+
+        string saveFileName = "Storage.json";
 
         // MainWindow Initialization
         public MainWindow()
         {
             InitializeComponent();
             SelectDisplayWeek.SelectedDate = DateTime.Today;
+
+            //load JSON data
+            calendar.LoadXML(saveFileName);
+
+            //set current week to corresponding data in calendar
+            TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
+            long curWeekEpoch = (long)t.TotalSeconds;
+            currentWeek = calendar.GetWeek(curWeekEpoch);
         }
 
         // Close Window
@@ -62,23 +63,33 @@ namespace LifeTracker
         // Change Date Displayed (Date Picker)
         private void ArrivalDatePicker_DateChanged(object sender, EventArgs e)
         {
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            calendar.SaveXML(saveFileName);
+
             // Set week with Monday at the start.
             displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
             UpdateDisplayDates(displayStartOfWeek);
             // (use this to access events from JSON)
             long epochVal = (new DateTimeOffset(displayStartOfWeek)).ToUniversalTime().ToUnixTimeMilliseconds();
 
-            // Update displayed events to reflect current week.
-
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
 
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
 
-
-            // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably) - DEBUG
-            // ACCESS MIKE'S DATA STUFF
-            // GO THROUGH AND DISPLAY THAT DATA ON CALENDAR
-
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for(int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
         }
         // Convert date from date picker to nearest (on left) Monday to identify start of week
         private DateTime FindNearestMonday(DateTime inputDate)
@@ -95,22 +106,60 @@ namespace LifeTracker
         // Change Date Displayed (Right Arrow)
         private void MoveWeekForward(object sender, RoutedEventArgs e)
         {
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            calendar.SaveXML(saveFileName);
+
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(7);
             UpdateDisplayDates(displayStartOfWeek);
 
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
         }
         // Change Date Displayed (Left Arrow)
         private void MoveWeekBackward(object sender, RoutedEventArgs e)
         {
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            calendar.SaveXML(saveFileName);
+
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(-7);
             UpdateDisplayDates(displayStartOfWeek);
 
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
         }
         // Update Dates shown on display from input star- of-week day
         private void UpdateDisplayDates(DateTime inputDate)
@@ -132,6 +181,11 @@ namespace LifeTracker
         // Add an Event to the Display
         private void AddEventToDisplay(Event curEvent)
         {
+            //Add event into week object
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+            //DateTime dateTime = dateTimeOffset.DateTime;
+            //currentWeek.AddEvent(curEvent, (int)dateTime.DayOfWeek); -DEBUG <---- NEEDED?
+
             //Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
             int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
@@ -174,7 +228,7 @@ namespace LifeTracker
 
             //Create Timer
             // Calculate ms between current time and start time (account for 30 minutes beforehand)
-            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+            dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
             DateTime date2 = (dateTimeOffset.DateTime).AddMinutes(-30);
             DateTime date1 = DateTime.Now;
             TimeSpan ts = date2 - date1;
@@ -219,6 +273,9 @@ namespace LifeTracker
             textToEvent = new Dictionary<TextBlock, Event>();
             textToBlock = new Dictionary<TextBlock, Rectangle>();
             textToTimer = new Dictionary<TextBlock, Timer>();
+
+            currentWeek = new Week();
+            currentWeek.ClearWeek();
         }
         //Calculate corresponding height value (display attribute) to duration of Event (stored value)
         private int ConvertTimeToHeightNumber(DateTime inputTime)
@@ -257,7 +314,16 @@ namespace LifeTracker
             DateTime inputDate = dateTimeOffset.DateTime;
             DateTime startDate = displayStartOfWeek;
             DateTime endDate = startDate.AddDays(7);
-            if (startDate <= inputDate && inputDate < endDate) AddEventToDisplay(tempEvent);
+            if (startDate <= inputDate && inputDate < endDate)
+            {
+                //Add event into week object
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                DateTime dateTime = dateTimeOffset.DateTime;
+                currentWeek.AddEvent(tempEvent, (int)dateTime.DayOfWeek);
+
+                //Add event to display
+                AddEventToDisplay(tempEvent);
+            }
         }
         // Create Event object from User Input
         private Event CreateEvent(ref CreateEventWindow createWin)
@@ -310,9 +376,22 @@ namespace LifeTracker
             editWin.ShowDialog();
 
             // Create new event (unless should be deleted OR duration is negative)
-            if (editWin.deleteEventBool == false) AddEventToDisplay(EditEvent(ref editWin));
+            if (editWin.deleteEventBool == false)
+            {
+                //Add event into week object
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(EditEvent(ref editWin).GetDate_Time());
+                dateTime = dateTimeOffset.DateTime;
+                currentWeek.AddEvent(EditEvent(ref editWin), (int)dateTime.DayOfWeek);
+
+                //Add event to display
+                AddEventToDisplay(EditEvent(ref editWin));
+            }
 
             // Delete old event
+            dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time());
+            dateTime = dateTimeOffset.DateTime;
+            currentWeek.DeleteEvent(selectedEvent, (int)dateTime.DayOfWeek);
+
             Scroll_Area.Children.Remove((TextBlock)sender);
             Scroll_Area.Children.Remove(textToBlock[(TextBlock)sender]);
             textToEvent.Remove((TextBlock)sender);
@@ -603,6 +682,17 @@ namespace LifeTracker
         protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
         protected private long date;
 
+        public void ClearWeek()
+        {
+            mon = new List<Event>(); //lists of events
+            tue = new List<Event>();
+            wed = new List<Event>();
+            thu = new List<Event>();
+            fri = new List<Event>();
+            sat = new List<Event>();
+            sun = new List<Event>();
+    }
+
         public long GetDate()
         {
             return date;
@@ -632,18 +722,25 @@ namespace LifeTracker
 
     // Calendar Class
 
-    class Calendar
+    public class Calendar
     {
-        private Dictionary<long, Week> weeks;
+        private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
 
-        Week GetWeek(long key)
+        public Week GetWeek(long key)
         {
+            if (!weeks.ContainsKey(key))
+            {
+                Week newWeek = new Week();
+                newWeek.SetDate(key);
+                this.AddWeek(newWeek);
+                return newWeek;
+            }
             return weeks[key];
         }
 
         public void AddWeek(Week week)
         {
-            weeks.Add(week.GetDate(), week); //DEBUG - not an actual function in "Week"
+            if (!weeks.ContainsKey(week.GetDate())) weeks.Add(week.GetDate(), week);
         }
 
         public void RemoveWeek(long key)
@@ -684,6 +781,36 @@ namespace LifeTracker
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
+        }
+
+        public void SaveXML(String filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath);
+            }
+
+            System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
+            System.IO.FileStream file = System.IO.File.Create(filePath);
+            saver.Serialize(file, this);
+            file.Close();
+        }
+        public Calendar LoadXML(String filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath);
+            }
+
+            if (new FileInfo(filePath).Length == 0) return new Calendar();
+            else
+            {
+                System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
+                System.IO.StreamReader file = new System.IO.StreamReader(filePath);
+                var calendar = (Calendar)loader.Deserialize(file);
+                file.Close();
+                return calendar;
+            }
         }
     }
 }
