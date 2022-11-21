@@ -51,3 +51,33 @@ C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-wi
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Meeting Reminder.mp3
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker_Content.g.cs
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Meeting Reminder.wav
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Meeting Reminder.mp3
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Meeting Reminder.wav
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\LifeTracker.exe
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\LifeTracker.deps.json
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\LifeTracker.runtimeconfig.json
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\LifeTracker.dll
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\LifeTracker.pdb
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.csproj.AssemblyReference.cache
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\CreateEventWindow.g.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\EditEventWindow.g.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\MainWindow.g.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ReminderWindow.g.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\App.g.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker_Content.g.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker_MarkupCompile.cache
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker_MarkupCompile.lref
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\CreateEventWindow.baml
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\EditEventWindow.baml
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\MainWindow.baml
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ReminderWindow.baml
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.g.resources
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.AssemblyInfoInputs.cache
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.AssemblyInfo.cs
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.csproj.CoreCompileInputs.cache
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.dll
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\refint\LifeTracker.dll
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.pdb
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.genruntimeconfig.cache
+C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ref\LifeTracker.dll

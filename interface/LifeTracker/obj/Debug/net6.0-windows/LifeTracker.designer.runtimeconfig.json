@@ -12,8 +12,8 @@
       }
     ],
     "additionalProbingPaths": [
-      "C:\\Users\\cohene4\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\cohene4\\.nuget\\packages"
+      "C:\\Users\\ittya\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\ittya\\.nuget\\packages"
     ],
     "configProperties": {
       "Microsoft.NETCore.DotNetHostPolicy.SetAppPaths": true
