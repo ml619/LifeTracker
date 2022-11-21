@@ -8,8 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Meeting Reminder.mp3" />
+    <None Remove="Meeting Reminder.wav" />
     <None Remove="Muted.png" />
     <None Remove="Unmuted.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Meeting Reminder.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Meeting Reminder.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

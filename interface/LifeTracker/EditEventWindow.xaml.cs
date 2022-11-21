@@ -44,14 +44,22 @@ namespace LifeTracker
                         TimeList1.Items.Add(i + ":" + "0" + j);
                         TimeList2.Items.Add(i + ":" + "0" + j);
                     }
+                    else
+                    {
+                        TimeList1.Items.Add(i + ":" + j);
+                        TimeList2.Items.Add(i + ":" + j);
+                    }
                 }
             }
+            TimeList1.SelectedIndex = 0; TimeList2.SelectedIndex = 4;
             AMPM1.Items.Add("AM"); AMPM1.Items.Add("PM");
             AMPM2.Items.Add("AM"); AMPM2.Items.Add("PM");
+            AMPM1.SelectedIndex = 0; AMPM2.SelectedIndex = 0;
 
             PriorityList.Items.Add("LOW"); FlexibilityList.Items.Add("LOW");
             PriorityList.Items.Add("MED"); FlexibilityList.Items.Add("MED");
             PriorityList.Items.Add("HIGH"); FlexibilityList.Items.Add("HIGH");
+            PriorityList.SelectedIndex = 0; FlexibilityList.SelectedIndex = 0;
 
             MonthList.Items.Add("Jan"); MonthList.Items.Add("Feb");
             MonthList.Items.Add("Mar"); MonthList.Items.Add("Apr");
@@ -59,22 +67,26 @@ namespace LifeTracker
             MonthList.Items.Add("Jul"); MonthList.Items.Add("Aug");
             MonthList.Items.Add("Sep"); MonthList.Items.Add("Oct");
             MonthList.Items.Add("Nov"); MonthList.Items.Add("Dec");
+            MonthList.Text = DateTime.Now.ToString("MMM");
 
             for (int i = 1; i <= 31; i++)
             {
                 if(i>9) DayList.Items.Add(i.ToString());
                 else DayList.Items.Add("0"+i.ToString());
             }
+            DayList.Text = DateTime.Now.ToString("dd");
 
             for (int i = 2030; i >= 1970; i--)
             {
                 YearList.Items.Add(i.ToString());
             }
+            YearList.Text = DateTime.Now.ToString("yyyy");
 
             ColorList.Items.Add("LightBlue"); ColorList.Items.Add("LightPink");
             ColorList.Items.Add("PeachPuff"); ColorList.Items.Add("Silver");
             ColorList.Items.Add("PaleGoldenrod"); ColorList.Items.Add("BurlyWood");
             ColorList.Items.Add("Plum"); ColorList.Items.Add("LightGreen");
+            ColorList.Text = "LightBlue";
         }
 
         private void Okay_Button_Click(object sender, RoutedEventArgs e)

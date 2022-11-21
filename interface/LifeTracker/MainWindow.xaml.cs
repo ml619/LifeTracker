@@ -12,38 +12,82 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
+using System.IO;
+using System.Diagnostics;
+using System.Xml.Serialization;
+
 
 namespace LifeTracker
 {
-    // ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None"
-
-
-
-
-
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-
     public partial class MainWindow : Window
     {
         // Public variables
         public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>();
         public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();
+        public Dictionary<TextBlock, System.Windows.Threading.DispatcherTimer> textToTimer = new Dictionary<TextBlock, System.Windows.Threading.DispatcherTimer>();
+
         public DateTime displayStartOfWeek = DateTime.Today;
-        //current week loaded (TEMPORARILY A BLANK WEEK - FINAL SHOULD LOAD WEEK WITH CURRENT DATE) - DEBUG
-        public static week currentWeek = new week();
+        public Week currentWeek = new Week();
+        public Calendar calendar = new Calendar();
+
+        string saveFileName = "Storage.xml";
+
+        bool muteCheck = false;
+
+        bool suggestMode = false;
+        Event suggestedEvent = null;
+        Event originalEvent = null;
+
+        public TaskCompletionSource<bool> tcs1 = null;
+        public TaskCompletionSource<bool> tcs2 = null;
+
 
         // MainWindow Initialization
         public MainWindow()
         {
             InitializeComponent();
             SelectDisplayWeek.SelectedDate = DateTime.Today;
-        }
 
+            //load JSON data
+            calendar.LoadXML(saveFileName);
+
+            //set current week to corresponding data in calendar
+            TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
+            long curWeekEpoch = (long)t.TotalSeconds;
+            currentWeek = calendar.GetWeek(curWeekEpoch);
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
+
+            //set accept/reject buttons to default hidden (off screen)
+            AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+            RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+        } 
+
+        // Mute Window
+        private void MuteButton_Click(object sender, RoutedEventArgs e)
+        {
+            //toggle bool
+            muteCheck = !muteCheck;
+            //update button text
+            if (muteCheck) MuteButton.Content = "Unmute";
+            else MuteButton.Content = "Mute";
+        }
         // Close Window
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            calendar.SaveXML(saveFileName);
             Close();
         }
         // Minimize Window
@@ -58,29 +102,40 @@ namespace LifeTracker
         // Change Date Displayed (Date Picker)
         private void ArrivalDatePicker_DateChanged(object sender, EventArgs e)
         {
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            //calendar.SaveXML(saveFileName); DEBUG
+
             // Set week with Monday at the start.
             displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
             UpdateDisplayDates(displayStartOfWeek);
             // (use this to access events from JSON)
             long epochVal = (new DateTimeOffset(displayStartOfWeek)).ToUniversalTime().ToUnixTimeMilliseconds();
 
-            // Update displayed events to reflect current week.
-
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
 
-            // CLEAR CURRENT EVENTS DISPLAYED (use epoch code below, probably) - DEBUG
-            // ACCESS MIKE'S DATA STUFF
-            // GO THROUGH AND DISPLAY THAT DATA ON CALENDAR
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
 
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
         }
         // Convert date from date picker to nearest (on left) Monday to identify start of week
         private DateTime FindNearestMonday(DateTime inputDate)
         {
             DateTime retDate = new DateTime();
 
-            // Find nearest Monday (going backwards in time), use result to find
-            //  corresponding week in stored data.
+            // Find nearest Monday (going backwards in time), use result to find corresponding week in stored data.
             // Day of week is found numerically - Monday = 0, Sunday = 6
             // Track backwards until reach Monday
             int curWeekDayNum = (int)(SelectDisplayWeek.SelectedDate.Value.DayOfWeek + 6) % 7;
@@ -90,22 +145,60 @@ namespace LifeTracker
         // Change Date Displayed (Right Arrow)
         private void MoveWeekForward(object sender, RoutedEventArgs e)
         {
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            //calendar.SaveXML(saveFileName); DEBUG
+
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(7);
             UpdateDisplayDates(displayStartOfWeek);
 
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
         }
         // Change Date Displayed (Left Arrow)
         private void MoveWeekBackward(object sender, RoutedEventArgs e)
         {
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            //calendar.SaveXML(saveFileName); DEBUG
+
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(-7);
             UpdateDisplayDates(displayStartOfWeek);
 
             // Clear current displayed and stored events
             ClearDisplayAndStoredEvents();
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
         }
         // Update Dates shown on display from input star- of-week day
         private void UpdateDisplayDates(DateTime inputDate)
@@ -127,6 +220,9 @@ namespace LifeTracker
         // Add an Event to the Display
         private void AddEventToDisplay(Event curEvent)
         {
+            //Add event into week object
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+
             //Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
             int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
@@ -167,9 +263,44 @@ namespace LifeTracker
             Scroll_Area.Children.Add(rec);
             Scroll_Area.Children.Add(txtblk);
 
+            //Create Timer
+            // Calculate ms between current time and start time (account for 30 minutes beforehand)
+            dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+            DateTime date2 = (dateTimeOffset.DateTime).AddMinutes(-30);
+            DateTime date1 = DateTime.Now;
+            TimeSpan ts = date2 - date1;
+            int ms = (int)ts.TotalMilliseconds;
+
+            // Create a timer with interval in ms (edge case check if time is negative)
+            System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
+            if (ms > 0)
+            {
+                timer.Tick += (sender, e) => OnTimedEvent(sender, e, curEvent);
+                timer.Interval = new TimeSpan(0, 0, 0, 0, ms);
+                timer.Start();
+            }
+            else timer = null;
+
             // Add rectangle-event pair to dictionary
             textToEvent.Add(txtblk, curEvent);
             textToBlock.Add(txtblk, rec);
+            textToTimer.Add(txtblk, timer);
+        }
+        // Open reminder pop-up when timer event occurs
+        private void OnTimedEvent(Object source, EventArgs e, Event curEvent)
+        {
+            // Put up pop-up window
+            if (!muteCheck)
+            {
+                ReminderWindow reminder = new ReminderWindow();
+                reminder.EventName.Text = curEvent.GetName();
+
+                DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+                reminder.EventStart.Text = (dateTimeOffset.DateTime).ToString("HH:mm");
+
+                reminder.EventLocation.Text = curEvent.GetLocation().ToString(); //DEBUG
+                reminder.Show();
+            }
         }
         // Clear Events From Display, Clear Events Stored in Temporary Memory
         private void ClearDisplayAndStoredEvents()
@@ -181,9 +312,14 @@ namespace LifeTracker
                 Scroll_Area.Children.Remove(textToBlock[entry.Key]);
                 textToEvent.Remove(entry.Key);
                 textToBlock.Remove(entry.Key);
+                textToTimer.Remove(entry.Key);
             }
             textToEvent = new Dictionary<TextBlock, Event>();
             textToBlock = new Dictionary<TextBlock, Rectangle>();
+            textToTimer = new Dictionary<TextBlock, System.Windows.Threading.DispatcherTimer>();
+
+            currentWeek = new Week();
+            currentWeek.ClearWeek();
         }
         //Calculate corresponding height value (display attribute) to duration of Event (stored value)
         private int ConvertTimeToHeightNumber(DateTime inputTime)
@@ -215,14 +351,38 @@ namespace LifeTracker
             Event tempEvent = CreateEvent(ref createWin);
 
             // Check if end time is before start time - do not create event if so
-            if (tempEvent.GetDuration() < 0) return; 
+            if (tempEvent.GetDuration() < 0) return;
 
             // Check if event within current week - if so, add to display
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
             DateTime inputDate = dateTimeOffset.DateTime;
             DateTime startDate = displayStartOfWeek;
             DateTime endDate = startDate.AddDays(7);
-            if (startDate <= inputDate && inputDate < endDate) AddEventToDisplay(tempEvent);
+            if (startDate <= inputDate && inputDate < endDate)
+            {
+                //Add event into week object
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                DateTime dateTime = dateTimeOffset.DateTime;
+                currentWeek.AddEvent(tempEvent, (int)dateTime.DayOfWeek);
+
+                //Add event to display
+                AddEventToDisplay(tempEvent);
+            }
+            else
+            {
+                //Look for correct week to add event to, do NOT add to current display
+                //dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                DateTime dateTime = dateTimeOffset.DateTime;
+
+                int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
+
+                int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
+                DateTime adjustedDate = dateTimeOffset.DateTime;
+
+                long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds;
+                calendar.AddEvent(tempEvent, mondayEpoch);
+            }
         }
         // Create Event object from User Input
         private Event CreateEvent(ref CreateEventWindow createWin)
@@ -238,11 +398,24 @@ namespace LifeTracker
             retEvent.SetPriority(createWin.PriorityList.Text);
             retEvent.SetDescription(createWin.DescriptionInput.Text);
 
+            retEvent.SetLocation(createWin.LocationInput.Text); //DEBUG
+
             return retEvent;
         }
         // Edit Event in Calendar from User Input, Update Display
         private void EditEventClick(object sender, RoutedEventArgs e)
         {
+            if (suggestMode) //check if in suggest mode
+            {
+                //set original event
+                originalEvent = textToEvent[(TextBlock)sender];
+
+                //mark that an event has been clicked
+                tcs1?.TrySetResult(true);
+
+                return; //exit (do not carry out edit event protocol)
+            }
+
             // Pop up Create Event window.
             EditEventWindow editWin = new EditEventWindow();
 
@@ -273,12 +446,27 @@ namespace LifeTracker
             editWin.ColorList.Text = selectedEvent.GetColor();
             editWin.DescriptionInput.Text = selectedEvent.GetDescription();
 
+            editWin.LocationInput.Text = selectedEvent.GetLocation(); //DEBUG
+
             editWin.ShowDialog();
 
             // Create new event (unless should be deleted OR duration is negative)
-            if (editWin.deleteEventBool == false) AddEventToDisplay(EditEvent(ref editWin));
+            if (editWin.deleteEventBool == false)
+            {
+                //Add event into week object
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(EditEvent(ref editWin).GetDate_Time());
+                dateTime = dateTimeOffset.DateTime;
+                currentWeek.AddEvent(EditEvent(ref editWin), (int)dateTime.DayOfWeek);
+
+                //Add event to display
+                AddEventToDisplay(EditEvent(ref editWin));
+            }
 
             // Delete old event
+            dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(selectedEvent.GetDate_Time());
+            dateTime = dateTimeOffset.DateTime;
+            currentWeek.DeleteEvent(selectedEvent, (int)dateTime.DayOfWeek);
+
             Scroll_Area.Children.Remove((TextBlock)sender);
             Scroll_Area.Children.Remove(textToBlock[(TextBlock)sender]);
             textToEvent.Remove((TextBlock)sender);
@@ -297,122 +485,33 @@ namespace LifeTracker
             retEvent.SetPriority(editWin.PriorityList.Text);
             retEvent.SetDescription(editWin.DescriptionInput.Text);
 
+            retEvent.SetLocation(editWin.LocationInput.Text); //DEBUG
+
             return retEvent;
         }
         // Convert User Input Date to Epoch Format (New Event Created)
         private long EpochTimeConversion(ref CreateEventWindow createWin)
         {
-            //convert from 12 to 24 hour time
-            String time12To24;
-            int temp;
-            if (createWin.AMPM1.Text == "AM")
-            {
-                time12To24 = createWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
-            }
+            DateTime tempDate = UserInputToDateTime(ref createWin, 1);
 
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
-
             return (int)t.TotalSeconds;
         }
         // Convert User Input Date to Epoch Format (Edited Pre-existing Event)
         private long EpochTimeConversion(ref EditEventWindow editWin)
         {
-            //convert from 12 to 24 hour time
-            String time12To24;
-            int temp;
-            if (editWin.AMPM1.Text == "AM")
-            {
-                time12To24 = editWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
-            }
+            DateTime tempDate = UserInputToDateTime(ref editWin, 1);
 
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
-            if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
-            if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
-
             return (int)t.TotalSeconds;
         }
         // Find Duration of Event in terms of hours (New Event Created)
         private double HoursDifferenceConversion(ref CreateEventWindow createWin)
         {
-            //---START---
-            //convert from 12 to 24 hour time
-            String time12To24; //MAKE THIS SECTION INTO A FUNCTION - IT IS USED IN FUNCTIONS ABOVE TOO - DEBUG
-            int temp;
-            if (createWin.AMPM1.Text == "AM")
-            { 
-                time12To24 = createWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate1 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-
-            //---END---
-            //convert from 12 to 24 hour time
-            if (createWin.AMPM2.Text == "AM")
-            {
-                time12To24 = createWin.TimeList2.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList2.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(createWin.TimeList2.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList2.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
-            if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
-            DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
-            if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
-            dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate2 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime tempDate1 = UserInputToDateTime(ref createWin, 1);
+            DateTime tempDate2 = UserInputToDateTime(ref createWin, 2);
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
@@ -421,204 +520,549 @@ namespace LifeTracker
         // Find Duration of Event in terms of hours (Edited Pre-existing Event)
         private double HoursDifferenceConversion(ref EditEventWindow editWin) //SIMPLIFY 12to24 CONVERTER - DEBUG
         {
-            //---START---
-            //convert from 12 to 24 hour time
-            String time12To24;
-            int temp;
-            if (editWin.AMPM1.Text == "AM")
-            {
-                time12To24 = editWin.TimeList1.Text;
-                if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
-            }
-            else
-            {
-                int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
-            if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
-            String DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
-            if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
-            String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate1 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-
-            //---END---
-            //convert from 12 to 24 hour time
-            if (editWin.AMPM2.Text == "AM") { time12To24 = editWin.TimeList2.Text; }
-            else
-            {
-                int.TryParse(editWin.TimeList2.Text.Substring(0, 2), out temp);
-                time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList2.Text.Substring(2);
-            }
-
-            //convert 0 to 12 in hour
-            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
-
-            //convert from datetime to epoch time
-            MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
-            if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
-            DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
-            if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
-            dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
-            DateTime tempDate2 = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime tempDate1 = UserInputToDateTime(ref editWin, 1);
+            DateTime tempDate2 = UserInputToDateTime(ref editWin, 2);
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
             return ((double)t.TotalSeconds) / 3600;
         }
+
+        private DateTime UserInputToDateTime(ref CreateEventWindow createWin, int startOrEnd)
+        {
+            {
+                //convert from 12 to 24 hour time (based on either start or end time)
+                String time12To24;
+                int temp;
+                if (startOrEnd == 1)
+                {
+                    if (createWin.AMPM1.Text == "AM")
+                    {
+                        time12To24 = createWin.TimeList1.Text;
+                        if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList1.Text.Substring(2);
+                    }
+                    else
+                    {
+                        int.TryParse(createWin.TimeList1.Text.Substring(0, 2), out temp);
+                        time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList1.Text.Substring(2);
+                    }
+                }
+                else
+                {
+                    if (createWin.AMPM2.Text == "AM")
+                    {
+                        time12To24 = createWin.TimeList2.Text;
+                        if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + createWin.TimeList2.Text.Substring(2);
+                    }
+                    else
+                    {
+                        int.TryParse(createWin.TimeList2.Text.Substring(0, 2), out temp);
+                        time12To24 = ((temp + 12) % 24).ToString() + createWin.TimeList2.Text.Substring(2);
+                    }
+                }
+
+                //convert 0 to 12 in hour
+                if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
+
+                //convert user input to date
+                String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
+                if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
+                String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
+                if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
+                String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
+
+                //return final date
+                return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
+        private DateTime UserInputToDateTime(ref EditEventWindow editWin, int startOrEnd)
+        {
+            //convert from 12 to 24 hour time (based on either start or end time)
+            String time12To24;
+            int temp;
+            if (startOrEnd == 1)
+            {
+                if (editWin.AMPM1.Text == "AM")
+                {
+                    time12To24 = editWin.TimeList1.Text;
+                    if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList1.Text.Substring(2);
+                }
+                else
+                {
+                    int.TryParse(editWin.TimeList1.Text.Substring(0, 2), out temp);
+                    time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList1.Text.Substring(2);
+                }
+            }
+            else
+            {
+                if (editWin.AMPM2.Text == "AM")
+                {
+                    time12To24 = editWin.TimeList2.Text;
+                    if (time12To24.Substring(0, 2) == "12") time12To24 = "00" + editWin.TimeList2.Text.Substring(2);
+                }
+                else
+                {
+                    int.TryParse(editWin.TimeList2.Text.Substring(0, 2), out temp);
+                    time12To24 = ((temp + 12) % 24).ToString() + editWin.TimeList2.Text.Substring(2);
+                }
+            }
+
+            //convert 0 to 12 in hour
+            if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
+
+            //convert user input to date
+            String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
+            if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
+            String DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
+            if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
+            String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
+
+            //return final date
+            return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        private void AvailabilityButtonClick(object sender, RoutedEventArgs e)
+        {
+            currentWeek.ExportAvailability();
+        }
+
+        private async void RescheduleButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (suggestMode)
+            {
+                //mark that exiting reschedule mode
+                tcs2?.TrySetResult(true);
+                suggestMode = false;
+
+                //hide buttons again, clear suggest event, revert display background color
+                AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+                RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+                suggestedEvent = null;
+                originalEvent = null;
+                MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
+
+                return;
+            }
+
+            suggestMode = true;
+
+            //change display background color
+            MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8126C0F");
+
+            //wait for event to be selected
+            tcs1 = new TaskCompletionSource<bool>();
+            await tcs1.Task;
+
+            //add suggested event to display (NOT to week object yet)
+            suggestedEvent = GetSuggestion(originalEvent, ref calendar); //DEBUG <-- ADD IN THE ACTUAL FUNCTION
+
+            //add accept/reject buttons to display, do not allow any other actions until one is clicked]
+            //Set x margin to correspond to day of week
+            DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(suggestedEvent.GetDate_Time()).DateTime;
+            int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
+            if (x_margin < 0) x_margin = 606;
+
+            //Set y_margin to correspond to time during day
+            //each 1/4 hour = 8 units
+            int y_margin = 8 * (ConvertTimeToHeightNumber(datetime)) + 11;
+
+            AcceptSuggestionButton.Margin = new Thickness(x_margin + 43, y_margin + 3, 0, 0);
+            RejectSuggestionButton.Margin = new Thickness(x_margin + 69, y_margin + 3, 0, 0);
+
+            //wait for accept/reject to be pressed
+            tcs2 = new TaskCompletionSource<bool>();
+            await tcs2.Task;
+
+            //hide buttons again, clear suggest event, revert display background color
+            AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+            RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+            suggestedEvent = null;
+            originalEvent = null;
+            MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
+        }
+        private Event GetSuggestion(Event originalEvent, ref Calendar calendar)
+        {
+            return originalEvent; //DEBUG <---ADD THE ACTUAL FUNCTIONALITY
+        }
+
+        private void Accept_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //mark that an accept has been chosen
+            tcs2?.TrySetResult(true);
+
+            //add suggested event to week DEBUG
+
+            //remove original event (from display and week)
+
+
+            suggestMode = false;
+        }
+        private void Reject_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //mark that an reject has been chosen
+            tcs2?.TrySetResult(true);
+
+            //remove suggested event from display DEBUG
+
+
+            suggestMode = false;
+        }
     }
-}
 
 
-// Event Classes
-public class Event //description, priority, time, color, flexibility
-{
+    //CLASSES
 
-    protected private string name; // name of event
-    public string GetName()
+    // Event Classes
+    public class Event //description, priority, time, color, flexibility
     {
-        return name;
-    }
-    public void SetName(string Name)
-    {
-        name = Name;
-    }
 
-
-    protected private long date_time; //date and time in epoch
-    public long GetDate_Time()
-    {
-        return date_time;
-    }
-    public void SetDate_Time(long Date_Time)
-    {
-        date_time = Date_Time;
-    }
+        public string name; // name of event
+        public string GetName()
+        {
+            return name;
+        }
+        public void SetName(string Name)
+        {
+            name = Name;
+        }
 
 
-    protected private int flexibility;
-    public int GetFlexibility()
-    {
-        return flexibility;
-    }
-    public void SetFlexibility(int Flexibility)
-    {
-        flexibility = Flexibility;
-    }
+        public long date_time; //date and time in epoch
+        public long GetDate_Time()
+        {
+            return date_time;
+        }
+        public void SetDate_Time(long Date_Time)
+        {
+            date_time = Date_Time;
+        }
 
 
-    protected private string color; // color of event
-    public string GetColor()
-    {
-        return color;
-    }
-    public void SetColor(string Color)
-    {
-        color = Color;
-    }
+        public int flexibility;
+        public int GetFlexibility()
+        {
+            return flexibility;
+        }
+        public void SetFlexibility(int Flexibility)
+        {
+            flexibility = Flexibility;
+        }
 
 
-    protected private double duration; //IN TERMS OF HOURS
-    public double GetDuration()
-    {
-        return duration;
-    }
-    public void SetDuration(double Duration)
-    {
-        duration = Duration;
-    }
+        public string color; // color of event
+        public string GetColor()
+        {
+            return color;
+        }
+        public void SetColor(string Color)
+        {
+            color = Color;
+        }
 
 
-    protected private string priority;
-    public string GetPriority()
-    {
-        return priority;
-    }
-    public void SetPriority(string Priority)
-    {
-        priority = Priority;
-    }
+        public double duration; //in terms of number of hours (NOT epoch)
+        public double GetDuration()
+        {
+            return duration;
+        }
+        public void SetDuration(double Duration)
+        {
+            duration = Duration;
+        }
 
 
-    protected private string description; //short description of acitiviy 
-    public string GetDescription()
-    {
-        return description;
-    }
-    public void SetDescription(string Description)
-    {
-        description = Description;
-    }
-}
+        public string priority;
+        public string GetPriority()
+        {
+            return priority;
+        }
+        public void SetPriority(string Priority)
+        {
+            priority = Priority;
+        }
 
-class location : Event
-{
-    protected private string eventname; // name of location
-    public string GetEventName()
-    {
-        return eventname;
-    }
-    public void SetEventName(string EventName)
-    {
-        eventname = EventName;
-    }
 
-}
+        public string description; //short description of acitiviy 
+        public string GetDescription()
+        {
+            return description;
+        }
+        public void SetDescription(string Description)
+        {
+            description = Description;
+        }
 
-class recurring : Event
-{
-    private protected long end_date; // end of recurring 
-    public long GetEnd_Date()
-    {
-        return end_date;
-    }
-    public void SetEnd_Date(long End_Date)
-    {
-        end_date = End_Date;
+
+
+
+
+
+        //DEBUG
+        public string location;
+        public string GetLocation()
+        {
+            return location;
+        }
+        public void SetLocation(string Location)
+        {
+            location = Location;
+        }
     }
 
-
-    private protected int step; //how often 
-    public int GetStep()
+    /*class location : Event //DEBUG
     {
-        return step;
+        protected private string eventname; // name of location
+        public string GetEventName()
+        {
+            return eventname;
+        }
+        public void SetEventName(string EventName)
+        {
+            eventname = EventName;
+        }
+
+    }*/
+
+    class Recurring : Event
+    {
+        private protected long end_date; // end of recurring 
+        public long GetEnd_Date()
+        {
+            return end_date;
+        }
+        public void SetEnd_Date(long End_Date)
+        {
+            end_date = End_Date;
+        }
+
+
+        private protected int step; //how often 
+        public int GetStep()
+        {
+            return step;
+        }
+        public void Step(int Step)
+        {
+            step = Step;
+        }
     }
-    public void Step(int Step)
+
+    // Week Class
+    public class Week
     {
-        step = Step;
+        public List<Event> mon; //lists of events       DEBUG <--- EVERYTHING PUBLIC SO IT CAN BE SERIALIZED
+        public List<Event> tue;
+        public List<Event> wed;
+        public List<Event> thu;
+        public List<Event> fri;
+        public List<Event> sat;
+        public List<Event> sun;
+
+        public List<List<Event>> a_week;
+        public long date;
+
+        public Week()
+        {
+            mon = new List<Event>(); //lists of events       DEBUG <--- EVERYTHING PUBLIC SO IT CAN BE SERIALIZED
+            tue = new List<Event>();
+            wed = new List<Event>();
+            thu = new List<Event>();
+            fri = new List<Event>();
+            sat = new List<Event>();
+            sun = new List<Event>();
+
+            a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
+        }
+
+        public long GetDate()
+        {
+            return date;
+        }
+
+        public void SetDate(long inputDate)
+        {
+            date = inputDate;
+        }
+
+        public List<List<Event>> GetWeek()
+        {
+            return a_week;
+        }
+
+        public void AddEvent(Event event1, int day)
+        {
+            a_week[day].Add(event1);
+        }
+
+        public void DeleteEvent(Event event1, int day)
+        {
+            a_week[day].Remove(event1);
+        }
+        public void ExportAvailability()
+        {
+            // create a file to write to 
+            string fileName = "Availability.txt";
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            using (StreamWriter sw = File.CreateText(fileName))
+            {
+                for (int i = 0; i <= 6; i++)
+                {
+                    List<string> days = new List<string>
+                    { "Monday\n", "\n\nTuesday\n", "\n\nWednesday\n", "\n\nThursday\n", "\n\nFriday\n", "\n\nSaturday\n", "\n\nSunday\n" };
+                    sw.WriteLine(days[i]);
+                    for (int j = 0; j < a_week[(i + 1) % 7].Count; j++)
+                    {
+                        long epochSeconds = a_week[(i + 1) % 7][j].GetDate_Time();
+                        long epochDuration = (long)(a_week[(i + 1) % 7][j].GetDuration() * 3600);
+
+                        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
+                        DateTime dateTime = dateTimeOffset.DateTime;
+                        string startTime = dateTime.ToString("HH:mm");
+
+                        long endtimeepoch = epochSeconds + epochDuration;
+                        dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(endtimeepoch);
+                        dateTime = dateTimeOffset.DateTime;
+                        string endTime = dateTime.ToString("HH:mm");
+
+                        sw.WriteLine(startTime + " to " + endTime + ",");
+                    }
+                }
+            }
+
+            //open file once written to
+            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
+        }
     }
-}
 
-// Week Class
-public class Week
-{
-    protected private static List<Event> mon = new List<Event>(); //lists of events
-    protected private static List<Event> tue = new List<Event>();
-    protected private static List<Event> wed = new List<Event>();
-    protected private static List<Event> thu = new List<Event>();
-    protected private static List<Event> fri = new List<Event>();
-    protected private static List<Event> sat = new List<Event>();
-    protected private static List<Event> sun = new List<Event>();
 
-    protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
+    // Calendar Class
 
-    public List<List<Event>> GetWeek()
+    public class Calendar
     {
-        return a_week;
+        [XmlIgnore]
+        private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
+
+        public List<SerializeableKeyValue<long, Week>> weeksSerializeable = new List<SerializeableKeyValue<long, Week>>(); //DEBUG <--- make this match the rest of the code
+
+        public Week GetWeek(long key)
+        {
+            if (!weeks.ContainsKey(key))
+            {
+                Week newWeek = new Week();
+                newWeek.SetDate(key);
+                this.AddWeek(newWeek);
+                return newWeek;
+            }
+            return weeks[key];
+        }
+
+        public void AddWeek(Week week)
+        {
+            if (!weeks.ContainsKey(week.GetDate())) weeks.Add(week.GetDate(), week);
+        }
+
+        public void RemoveWeek(long key)
+        {
+            weeks.Remove(key);
+        }
+
+        public void SetWeek(long key, Week week)
+        {
+            weeks[key] = week;
+        }
+
+        public void AddEvent(Event inputEvent, long date) //event, corresponding start-of-week in epoch format
+        {
+            if (weeks.ContainsKey(date))
+            {
+                weeks[date].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+            }
+            else
+            {
+                Week newWeek = new Week();
+                newWeek.AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+                weeks[date] = newWeek;
+            }
+        }
+
+        public void DeleteEvent(Event inputEvent)
+        {
+            weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        }
+
+        public void AddEvent(Event inputEvent)
+        {
+            weeks[inputEvent.GetDate_Time()].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        }
+
+        private int EpochToWeekday(long inputDate)
+        {
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
+            return (int)(dateTimeOffset.DateTime).DayOfWeek;
+        }
+
+        public void SaveXML(String filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath);
+            }
+
+            //convert dictionary to serializable list
+            weeksSerializeable = new List<SerializeableKeyValue<long, Week>>();
+            foreach (KeyValuePair<long, Week> p in weeks)
+            {
+                weeksSerializeable.Add(new SerializeableKeyValue<long, Week>(p.Key, p.Value));
+            }
+
+            System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
+            System.IO.FileStream file = System.IO.File.Create(filePath);
+            saver.Serialize(file, this);
+            file.Close();
+        }
+        public Calendar LoadXML(String filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath);
+            }
+
+            if (new FileInfo(filePath).Length == 0) return new Calendar();
+            else
+            {
+                System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
+                System.IO.StreamReader file = new System.IO.StreamReader(filePath);
+                var calendar = (Calendar)loader.Deserialize(file);
+                file.Close();
+
+                weeksSerializeable = calendar.weeksSerializeable;
+
+                //convert serializable list to dictionary
+                weeks = new Dictionary<long, Week>();
+                //weeks = weeksSerializeable.ToDictionary(x => x.Key, x => x.Value); //DEBUG
+                foreach (SerializeableKeyValue<long, Week> p in weeksSerializeable)
+                {
+                    if (!weeks.ContainsKey(p.Key)) weeks.Add(p.Key, p.Value);
+                }
+
+                return calendar;
+            }
+        }
     }
-
-    public void Add(Event event1, int day)
+    public class SerializeableKeyValue<T1, T2> //DEBUG <--- ADD TO CLASS DIAGRAMS!!!!!
     {
-        a_week[day].Add(event1);
-    }
-
-    public void Delete(Event event1, int day)
-    {
-        a_week[day].Remove(event1);
+        public T1 Key { get; set; }
+        public T2 Value { get; set; }
+        public SerializeableKeyValue() { }
+        public SerializeableKeyValue(T1 t1, T2 t2)
+        {
+            Key = t1;
+            Value = t2;
+        }
     }
 }
