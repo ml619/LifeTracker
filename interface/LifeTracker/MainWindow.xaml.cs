@@ -383,6 +383,7 @@ namespace LifeTracker
                 calendar.AddEvent(tempEvent, mondayEpoch);
             }
 
+
             //If recurring event, add to subsequent weeks afterwards
             if (tempEvent.GetType() == typeof(Recurring))
             {
@@ -687,6 +688,9 @@ namespace LifeTracker
             //add suggested event to display (NOT to week object yet)
             suggestedEvent = calendar.GetSuggestion(originalEvent, currentWeek);
 
+            //display suggestion
+            AddEventToDisplay(suggestedEvent);
+
             //add accept/reject buttons to display, do not allow any other actions until one is clicked]
             //Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(suggestedEvent.GetDate_Time()).DateTime;
@@ -719,8 +723,50 @@ namespace LifeTracker
             tcs2?.TrySetResult(true);
 
             //add suggested event to week DEBUG --ABBY
+            //Add event into week object
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(suggestedEvent.GetDate_Time());
+            DateTime dateTime = dateTimeOffset.DateTime;
+            currentWeek.AddEvent(suggestedEvent, (int)dateTime.DayOfWeek);
 
-            //remove original event (from display and week)
+            //remove original event (from display and week) & suggested event (non-finalized version)
+            dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(originalEvent.GetDate_Time());
+            dateTime = dateTimeOffset.DateTime;
+            currentWeek.DeleteEvent(originalEvent, (int)dateTime.DayOfWeek);
+
+
+
+
+
+            //RELOAD EVERYTHING
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            //calendar.SaveXML(saveFileName); DEBUG
+
+            // Set week with Monday at the start.
+            displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
+            UpdateDisplayDates(displayStartOfWeek);
+            // (use this to access events from JSON)
+            long epochVal = (new DateTimeOffset(displayStartOfWeek)).ToUniversalTime().ToUnixTimeMilliseconds();
+
+            // Clear current displayed and stored events
+            ClearDisplayAndStoredEvents();
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
+
+
 
 
             suggestMode = false;
@@ -731,6 +777,43 @@ namespace LifeTracker
             tcs2?.TrySetResult(true);
 
             //remove suggested event from display DEBUG --ABBY
+
+
+
+
+
+
+            //RELOAD EVERYTHING
+            // Save current week data to calendar & JSON
+            TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            calendar.RemoveWeek((long)t.TotalSeconds);
+            calendar.AddWeek(currentWeek);
+            //calendar.SaveXML(saveFileName); DEBUG
+
+            // Set week with Monday at the start.
+            displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
+            UpdateDisplayDates(displayStartOfWeek);
+            // (use this to access events from JSON)
+            long epochVal = (new DateTimeOffset(displayStartOfWeek)).ToUniversalTime().ToUnixTimeMilliseconds();
+
+            // Clear current displayed and stored events
+            ClearDisplayAndStoredEvents();
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
+
+
+
 
 
             suggestMode = false;
@@ -1113,12 +1196,16 @@ namespace LifeTracker
                 dateTime.AddHours(1.0);
                 TimeSpan t = dateTime - new DateTime(1970, 1, 1);
                 long curWeekEpoch = (long)t.TotalSeconds;
+
                 tryevent.SetDate_Time(curWeekEpoch);
 
                 tryevent.SetFlexibility(inevent.GetFlexibility());
                 tryevent.SetColor(inevent.GetColor());
                 tryevent.SetPriority(inevent.GetPriority());
                 tryevent.SetDescription(inevent.GetDescription());
+                tryevent.SetDuration(inevent.GetDuration());
+
+                tryevent.SetLocation(inevent.GetLocation());
 
                 int currDay = dateTime.Day;
                 int test = 0;
