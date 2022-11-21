@@ -73,7 +73,7 @@ namespace LifeTracker
             //set accept/reject buttons to default hidden (off screen)
             AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
             RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
-        } 
+        }
 
         // Mute Window
         private void MuteButton_Click(object sender, RoutedEventArgs e)
@@ -685,7 +685,7 @@ namespace LifeTracker
             await tcs1.Task;
 
             //add suggested event to display (NOT to week object yet)
-            suggestedEvent = GetSuggestion(originalEvent, ref calendar); //DEBUG <-- ADD IN THE ACTUAL FUNCTION
+            suggestedEvent = calendar.GetSuggestion(originalEvent, currentWeek);
 
             //add accept/reject buttons to display, do not allow any other actions until one is clicked]
             //Set x margin to correspond to day of week
@@ -711,17 +711,14 @@ namespace LifeTracker
             originalEvent = null;
             MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
         }
-        private Event GetSuggestion(Event originalEvent, ref Calendar calendar)
-        {
-            return originalEvent; //DEBUG <---ADD THE ACTUAL FUNCTIONALITY
-        }
+
 
         private void Accept_Button_Click(object sender, RoutedEventArgs e)
         {
             //mark that an accept has been chosen
             tcs2?.TrySetResult(true);
 
-            //add suggested event to week DEBUG
+            //add suggested event to week DEBUG --ABBY
 
             //remove original event (from display and week)
 
@@ -733,7 +730,7 @@ namespace LifeTracker
             //mark that an reject has been chosen
             tcs2?.TrySetResult(true);
 
-            //remove suggested event from display DEBUG
+            //remove suggested event from display DEBUG --ABBY
 
 
             suggestMode = false;
@@ -911,7 +908,6 @@ namespace LifeTracker
 
             a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
         }
-
         public void ClearWeek()
         {
             mon = new List<Event>(); //lists of events
@@ -1100,6 +1096,82 @@ namespace LifeTracker
 
                 return calendar;
             }
+        }
+
+        public Event GetSuggestion(Event inevent, Week week)
+        {
+            Dictionary<Event, long> scores = new Dictionary<Event, long>();
+            Event bestEvent = inevent;
+            long highestScore = 0;
+            foreach (List<Event> day in week.GetWeek())
+            {
+                Event tryevent = new Event();
+                tryevent.SetName(inevent.GetName());
+
+                DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inevent.GetDate_Time());
+                DateTime dateTime = dateTimeOffset.DateTime;
+                dateTime.AddHours(1.0);
+                TimeSpan t = dateTime - new DateTime(1970, 1, 1);
+                long curWeekEpoch = (long)t.TotalSeconds;
+                tryevent.SetDate_Time(curWeekEpoch);
+
+                tryevent.SetFlexibility(inevent.GetFlexibility());
+                tryevent.SetColor(inevent.GetColor());
+                tryevent.SetPriority(inevent.GetPriority());
+                tryevent.SetDescription(inevent.GetDescription());
+
+                int currDay = dateTime.Day;
+                int test = 0;
+                while (dateTime.Day == currDay)
+                {
+                    long newScore = calculateScore(tryevent, day);
+                    if (scores.ContainsKey(tryevent) == false)
+                        scores.Add(tryevent, newScore);
+
+                    if (newScore > highestScore)
+                    {
+                        highestScore = newScore;
+                        bestEvent = tryevent;
+                    }
+
+                    test++;
+                    dateTime = dateTime.AddHours(1.0);
+                    t = dateTime - new DateTime(1970, 1, 1);
+                    curWeekEpoch = (long)t.TotalSeconds;
+                    tryevent.SetDate_Time(curWeekEpoch);
+                }
+            }
+            return bestEvent;
+        }
+
+        private long calculateScore(Event inevent, List<Event> day)
+        {
+            //my fancy algorithm
+            long score;
+
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inevent.GetDate_Time());
+            DateTime dateTime = dateTimeOffset.DateTime;
+            long dateScore = inevent.GetDate_Time() - Math.Abs(dateTime.Hour - 12);
+
+            int priorityScore;
+            if (inevent.GetPriority() == "LOW")
+                priorityScore = 3;
+            else if (inevent.GetPriority() == "MED")
+                priorityScore = 2;
+            else
+                priorityScore = 1;
+
+            int flexScore = inevent.GetFlexibility();
+
+            int locationScore = 0;
+            //if(event.GetType() == typeof (location))
+            foreach (Event anevent in day)
+                if (anevent.GetLocation().Equals(inevent.GetLocation()))
+                    locationScore++;
+
+            score = dateScore + priorityScore + flexScore + locationScore;
+
+            return score;
         }
     }
     public class SerializeableKeyValue<T1, T2> //DEBUG <--- ADD TO CLASS DIAGRAMS!!!!!

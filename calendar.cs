@@ -57,27 +57,69 @@ class Calendar
         return (int)(dateTimeOffset.DateTime).DayOfWeek;
     }
 
-    public Event reschedule(Event event, Week week)
+    public Event GetSuggestion(Event inevent, Week week)
+    {
+        Dictionary<long, Event> scores = new Dictionary<long, Event>();
+        long highestScore = 0;
+        foreach (List<Event> day in week)
+        {
+            Event tryevent = new Event();
+            tryevent.SetName(inevent.GetName());
+
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inevent.GetDate_Time());
+            DateTime dateTime = dateTimeOffset.DateTime;
+            dateTime.AddHours(1.0);
+            TimeSpan t = dateTime - new DateTime(1970, 1, 1);
+            long curWeekEpoch = (long)t.TotalSeconds;
+            tryevent.SetDate_Time(curWeekEpoch);
+
+            tryevent.SetFlexibility(inevent.GetFlexibility());
+            tryevent.SetColor(inevent.GetColor());
+            tryevent.SetPriority(inevent.GetPriority());
+            tryevent.SetDescription(inevent.GetDescription());
+
+            while (dateTime.Hour < 24)
+            {
+                long newScore = calculateScore(tryevent, day);
+                scores.Add(newScore, tryevent);
+
+                if (newScore > highestScore)
+                    highestScore = newScore;
+
+                dateTime.AddHours(1.0);
+                t = dateTime - new DateTime(1970, 1, 1);
+                curWeekEpoch = (long)t.TotalSeconds;
+                tryevent.SetDate_Time(curWeekEpoch);
+            }
+        }
+        return scores[highestScore];
+    }
+
+    private long calculateScore(Event inevent, List<Event> day)
     {
         //my fancy algorithm
-        int score;
+        long score;
 
-        int dateScore = (event.GetDate_Time() * event.GetPriority());
-        
+        long dateScore = inevent.GetDate_Time() - Math.Abs(inevent.GetDate_Time().Hour - 12);
+
         int priorityScore;
-        if(event.GetPriority == "LOW")
+        if (inevent.GetPriority() == "LOW")
             priorityScore = 3;
-        else if(event.GetPriority == "MED")
+        else if (inevent.GetPriority() == "MED")
             priorityScore = 2;
         else
             priorityScore = 1;
 
-        priorityScore = priorityScore/100;
+        int flexScore = inevent.GetFlexibility();
 
-        int flexScore = event.GetFlexibility;
-
-        int locationScore = 0; //complete later!
+        int locationScore = 0;
+        //if(event.GetType() == typeof (location))
+        foreach (Event anevent in day)
+            if (anevent.GetLocation().Equals(inevent.GetLocation()))
+                locationScore++;
 
         score = dateScore + priorityScore + flexScore + locationScore;
+
+        return score;
     }
 }
