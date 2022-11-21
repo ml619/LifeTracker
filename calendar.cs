@@ -61,7 +61,7 @@ class Calendar
 
     public Event reschedule(Event event, Week week)
     {
-        Dictionary<Event,long> scores = new Dictionary<Event,long>();
+        Dictionary<long, Event> scores = new Dictionary<long, Event>();
         foreach(List<Event> day in week)
         {
             Event tryevent = new Event();
@@ -79,9 +79,23 @@ class Calendar
             tryevent.SetPriority(event.GetPriority());
             tryevent.SetDescription(event.GetDescription());
 
-            //addhours and days and such
+            long highestScore = 0;
+            while(dateTime.Hour < 24)
+            {
+                long newScore = calculateScore(tryevent, day)
+                scores.Add(newScore, tryevent);
+                
+                if(newScore > highestScore)
+                    highestScore = newScore;
+
+                dateTime.AddHours(1.0);
+                t = dateTime - new DateTime(1970, 1, 1);
+                curWeekEpoch = (long)t.TotalSeconds;
+                tryevent.SetDate_Time(curWeekEpoch);
+            }
         }
-        //return Event with highest Score
+        
+        return scores[highestScore];
     }
 
 
