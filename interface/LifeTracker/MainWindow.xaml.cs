@@ -371,7 +371,6 @@ namespace LifeTracker
             else
             {
                 //Look for correct week to add event to, do NOT add to current display
-                //dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
                 DateTime dateTime = dateTimeOffset.DateTime;
 
                 int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
@@ -383,11 +382,42 @@ namespace LifeTracker
                 long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds;
                 calendar.AddEvent(tempEvent, mondayEpoch);
             }
+
+            //If recurring event, add to subsequent weeks afterwards
+            if (tempEvent.GetType() == typeof(Recurring))
+            {
+                //increment by step until fulfilled all instances (minus current one)
+                for(int i = 0; i < ((Recurring)tempEvent).GetNumInstances() - 1; i++)
+                {
+                    //Look for correct week to add event to, do NOT add to current display
+                    DateTime dateTime = (dateTimeOffset.DateTime).AddDays(7 * ((Recurring)tempEvent).GetStep());
+
+                    int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
+
+                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
+                    DateTime adjustedDate = dateTimeOffset.DateTime;
+
+                    long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds; //DEBUG <----- monday of the first event, not changing for some reason
+                    calendar.AddEvent(tempEvent, mondayEpoch);
+                }
+            }
         }
         // Create Event object from User Input
         private Event CreateEvent(ref CreateEventWindow createWin)
         {
             Event retEvent = new Event();
+
+            //check whether recurring event or not
+            if (!(bool)createWin.RecurringCheck.IsChecked) retEvent = new Event();
+            else
+            {
+                Recurring tempEvent = new Recurring();
+                tempEvent.SetNumInstances(Int32.Parse(createWin.NumInstancesInput.Text));
+                tempEvent.SetStep(Int32.Parse(createWin.StepInput.Text));
+
+                retEvent = tempEvent;
+            }
 
             //duration stored in terms of hours (i.e. 1 hours, 1.25 hours, etc.)
             retEvent.SetName(createWin.TitleInput.Text);
@@ -824,25 +854,32 @@ namespace LifeTracker
 
     }*/
 
+
+
+
+    //from week that initial one is inserted on, traverse forwards until the end day, by step, adding to the individual calendars on that week
+    //if week doesn't exist, should be added (keep track of the mondays) DEBUG
+
+
+
     class Recurring : Event
     {
-        private protected long end_date; // end of recurring 
-        public long GetEnd_Date()
+        public int numInstances; // how many events there are //DEBUG <---- CHANGED FROM THE CLASS DIAGRAM
+        public long GetNumInstances()
         {
-            return end_date;
+            return numInstances;
         }
-        public void SetEnd_Date(long End_Date)
+        public void SetNumInstances(int NumInstances)
         {
-            end_date = End_Date;
+            numInstances = NumInstances;
         }
 
-
-        private protected int step; //how often 
+        public int step; //how often 
         public int GetStep()
         {
             return step;
         }
-        public void Step(int Step)
+        public void SetStep(int Step)
         {
             step = Step;
         }

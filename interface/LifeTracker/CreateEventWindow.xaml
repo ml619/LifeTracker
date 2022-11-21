@@ -5,24 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LifeTracker"
         mc:Ignorable="d"
-        Title="Create Event" Height="376" Width="362" Background="#E8E5FFE4" ResizeMode="NoResize">
+        Title="Create Event" Height="436" Width="362" Background="#E8E5FFE4" ResizeMode="NoResize">
     <Grid Background="#E8E5FFE4" Width="Auto" Margin="0,0,0,-6">
         <Grid.RowDefinitions>
-            <RowDefinition Height="33*"/>
-            <RowDefinition Height="45*"/>
-            <RowDefinition Height="44*"/>
+            <RowDefinition Height="52*"/>
+            <RowDefinition Height="71*"/>
+            <RowDefinition Height="138.506"/>
         </Grid.RowDefinitions>
         <TextBox x:Name="TitleInput" HorizontalAlignment="Left" Margin="84,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254"/>
         <TextBlock HorizontalAlignment="Left" Margin="12,12,0,0" TextWrapping="Wrap" Text="Title:" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="12,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="Time:"/><LineBreak/><Run/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Margin="12,66,0,0" TextWrapping="Wrap" Text="Date:" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="12,3,0,0" TextWrapping="Wrap" Text="Priority:" VerticalAlignment="Top" Grid.Row="1"/>
-        <TextBlock HorizontalAlignment="Left" Margin="12,33,0,0" TextWrapping="Wrap" Text="Flexibility:" VerticalAlignment="Top" Grid.Row="1"/>
-        <TextBlock HorizontalAlignment="Left" Margin="12,65,0,0" TextWrapping="Wrap" Text="Location:" VerticalAlignment="Top" Grid.Row="1"/>
-        <TextBlock HorizontalAlignment="Left" Margin="12,94,0,0" TextWrapping="Wrap" Text="Description:" VerticalAlignment="Top" Grid.Row="1"/>
-        <TextBlock HorizontalAlignment="Left" Margin="12,48,0,0" TextWrapping="Wrap" Text="Color:" VerticalAlignment="Top" Grid.Row="2"/>
-        <TextBox x:Name="LocationInput" HorizontalAlignment="Left" Margin="84,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Grid.Row="1"/>
-        <TextBox x:Name="DescriptionInput" HorizontalAlignment="Left" Margin="84,94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Height="75" Grid.RowSpan="2" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,103,0,0" TextWrapping="Wrap" Text="Priority:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,11,0,0" TextWrapping="Wrap" Text="Flexibility:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,43,0,0" TextWrapping="Wrap" Text="Location:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,73,0,0" TextWrapping="Wrap" Text="Description:" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,162,0,0" TextWrapping="Wrap" Text="Color:" VerticalAlignment="Top" Grid.Row="1" Grid.RowSpan="2"/>
+        <TextBox x:Name="LocationInput" HorizontalAlignment="Left" Margin="84,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Grid.Row="1"/>
+        <TextBox x:Name="DescriptionInput" HorizontalAlignment="Left" Margin="84,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Height="75" Grid.Row="1"/>
         <ComboBox x:Name="TimeList1" HorizontalAlignment="Left" Margin="84,35,0,0" VerticalAlignment="Top" Width="65" Height="21"/>
         <TextBlock HorizontalAlignment="Left" Margin="208,28,0,0" TextWrapping="Wrap" Text="-" VerticalAlignment="Top" FontSize="22" Height="29"/>
         <ComboBox x:Name="AMPM1" HorizontalAlignment="Left" Margin="154,35,0,0" VerticalAlignment="Top" Width="48" Height="21"/>
@@ -31,12 +31,16 @@
         <ComboBox x:Name="MonthList" HorizontalAlignment="Left" Margin="84,63,0,0" VerticalAlignment="Top" Width="76" Height="22"/>
         <ComboBox x:Name="DayList" HorizontalAlignment="Left" Margin="165,61,0,0" VerticalAlignment="Top" Width="52" Height="24"/>
         <ComboBox x:Name="YearList" HorizontalAlignment="Left" Margin="222,62,0,0" VerticalAlignment="Top" Width="73" Height="24"/>
-        <Rectangle HorizontalAlignment="Center" Height="32" Margin="0,77,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="Okay_Button_Click"/>
-        <TextBlock HorizontalAlignment="Center" Margin="0,81,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
-        <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,46,0,0" VerticalAlignment="Top" Width="76" Height="20" Grid.Row="2"/>
-        <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,32,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
+        <Rectangle HorizontalAlignment="Center" Height="32" Margin="0,89,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="Okay_Button_Click"/>
+        <TextBlock HorizontalAlignment="Center" Margin="0,93,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
+        <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,160,0,0" VerticalAlignment="Top" Width="76" Height="20" Grid.Row="1" Grid.RowSpan="2"/>
+        <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,10,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
         </ComboBox>
-        <ComboBox x:Name="PriorityList" HorizontalAlignment="Left" Margin="84,1,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
-        </ComboBox>
+        <ComboBox x:Name="PriorityList" HorizontalAlignment="Left" Margin="84,101,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.RowSpan="2"/>
+        <CheckBox x:Name="RecurringCheck" Content="Recurring?" HorizontalAlignment="Left" Margin="23,33,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="118,33,0,0" TextWrapping="Wrap" Text="If so, how many instances?" VerticalAlignment="Top" Grid.Row="2"/>
+        <TextBox x:Name="NumInstancesInput" HorizontalAlignment="Left" Margin="298,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40" Grid.Row="2" Height="16"/>
+        <TextBlock HorizontalAlignment="Left" Margin="118,57,0,0" TextWrapping="Wrap" Text="# of weeks between each event" VerticalAlignment="Top" Grid.Row="2"/>
+        <TextBox x:Name="StepInput" HorizontalAlignment="Left" Margin="298,56,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40" Grid.Row="2" Height="16"/>
     </Grid>
 </Window>
