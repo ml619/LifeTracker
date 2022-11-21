@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
+using System.Xml.Serialization;
 
 
 namespace LifeTracker
@@ -34,6 +35,14 @@ namespace LifeTracker
 
         bool muteCheck = false;
 
+        bool suggestMode = false;
+        Event suggestedEvent = null;
+        Event originalEvent = null;
+
+        public TaskCompletionSource<bool> tcs1 = null;
+        public TaskCompletionSource<bool> tcs2 = null;
+
+
         // MainWindow Initialization
         public MainWindow()
         {
@@ -47,7 +56,24 @@ namespace LifeTracker
             TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
             long curWeekEpoch = (long)t.TotalSeconds;
             currentWeek = calendar.GetWeek(curWeekEpoch);
-        }
+
+            // Load relevant week data to display and stored data
+            t = displayStartOfWeek - new DateTime(1970, 1, 1);
+            currentWeek = calendar.GetWeek((long)t.TotalSeconds);
+
+            for (int i = 0; i < 7; i++)
+            {
+                List<Event> dayInWeek = currentWeek.GetWeek()[i];
+                for (int j = 0; j < dayInWeek.Count; j++)
+                {
+                    AddEventToDisplay(dayInWeek[j]);
+                }
+            }
+
+            //set accept/reject buttons to default hidden (off screen)
+            AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+            RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+        } 
 
         // Mute Window
         private void MuteButton_Click(object sender, RoutedEventArgs e)
@@ -61,6 +87,7 @@ namespace LifeTracker
         // Close Window
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            calendar.SaveXML(saveFileName);
             Close();
         }
         // Minimize Window
@@ -79,7 +106,7 @@ namespace LifeTracker
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            calendar.SaveXML(saveFileName);
+            //calendar.SaveXML(saveFileName); DEBUG
 
             // Set week with Monday at the start.
             displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
@@ -122,7 +149,7 @@ namespace LifeTracker
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            calendar.SaveXML(saveFileName);
+            //calendar.SaveXML(saveFileName); DEBUG
 
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(7);
@@ -151,7 +178,7 @@ namespace LifeTracker
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            calendar.SaveXML(saveFileName);
+            //calendar.SaveXML(saveFileName); DEBUG
 
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(-7);
@@ -378,6 +405,17 @@ namespace LifeTracker
         // Edit Event in Calendar from User Input, Update Display
         private void EditEventClick(object sender, RoutedEventArgs e)
         {
+            if (suggestMode) //check if in suggest mode
+            {
+                //set original event
+                originalEvent = textToEvent[(TextBlock)sender];
+
+                //mark that an event has been clicked
+                tcs1?.TrySetResult(true);
+
+                return; //exit (do not carry out edit event protocol)
+            }
+
             // Pop up Create Event window.
             EditEventWindow editWin = new EditEventWindow();
 
@@ -584,15 +622,91 @@ namespace LifeTracker
             return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
         }
 
-
-
-
-
-
-
         private void AvailabilityButtonClick(object sender, RoutedEventArgs e)
         {
             currentWeek.ExportAvailability();
+        }
+
+        private async void RescheduleButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (suggestMode)
+            {
+                //mark that exiting reschedule mode
+                tcs2?.TrySetResult(true);
+                suggestMode = false;
+
+                //hide buttons again, clear suggest event, revert display background color
+                AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+                RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+                suggestedEvent = null;
+                originalEvent = null;
+                MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
+
+                return;
+            }
+
+            suggestMode = true;
+
+            //change display background color
+            MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8126C0F");
+
+            //wait for event to be selected
+            tcs1 = new TaskCompletionSource<bool>();
+            await tcs1.Task;
+
+            //add suggested event to display (NOT to week object yet)
+            suggestedEvent = GetSuggestion(originalEvent, ref calendar); //DEBUG <-- ADD IN THE ACTUAL FUNCTION
+
+            //add accept/reject buttons to display, do not allow any other actions until one is clicked]
+            //Set x margin to correspond to day of week
+            DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(suggestedEvent.GetDate_Time()).DateTime;
+            int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
+            if (x_margin < 0) x_margin = 606;
+
+            //Set y_margin to correspond to time during day
+            //each 1/4 hour = 8 units
+            int y_margin = 8 * (ConvertTimeToHeightNumber(datetime)) + 11;
+
+            AcceptSuggestionButton.Margin = new Thickness(x_margin + 43, y_margin + 3, 0, 0);
+            RejectSuggestionButton.Margin = new Thickness(x_margin + 69, y_margin + 3, 0, 0);
+
+            //wait for accept/reject to be pressed
+            tcs2 = new TaskCompletionSource<bool>();
+            await tcs2.Task;
+
+            //hide buttons again, clear suggest event, revert display background color
+            AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+            RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
+            suggestedEvent = null;
+            originalEvent = null;
+            MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
+        }
+        private Event GetSuggestion(Event originalEvent, ref Calendar calendar)
+        {
+            return originalEvent; //DEBUG <---ADD THE ACTUAL FUNCTIONALITY
+        }
+
+        private void Accept_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //mark that an accept has been chosen
+            tcs2?.TrySetResult(true);
+
+            //add suggested event to week DEBUG
+
+            //remove original event (from display and week)
+
+
+            suggestMode = false;
+        }
+        private void Reject_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //mark that an reject has been chosen
+            tcs2?.TrySetResult(true);
+
+            //remove suggested event from display DEBUG
+
+
+            suggestMode = false;
         }
     }
 
@@ -603,7 +717,7 @@ namespace LifeTracker
     public class Event //description, priority, time, color, flexibility
     {
 
-        protected private string name; // name of event
+        public string name; // name of event
         public string GetName()
         {
             return name;
@@ -614,7 +728,7 @@ namespace LifeTracker
         }
 
 
-        protected private long date_time; //date and time in epoch
+        public long date_time; //date and time in epoch
         public long GetDate_Time()
         {
             return date_time;
@@ -625,7 +739,7 @@ namespace LifeTracker
         }
 
 
-        protected private int flexibility;
+        public int flexibility;
         public int GetFlexibility()
         {
             return flexibility;
@@ -636,7 +750,7 @@ namespace LifeTracker
         }
 
 
-        protected private string color; // color of event
+        public string color; // color of event
         public string GetColor()
         {
             return color;
@@ -647,7 +761,7 @@ namespace LifeTracker
         }
 
 
-        protected private double duration; //in terms of number of hours (NOT epoch)
+        public double duration; //in terms of number of hours (NOT epoch)
         public double GetDuration()
         {
             return duration;
@@ -658,7 +772,7 @@ namespace LifeTracker
         }
 
 
-        protected private string priority;
+        public string priority;
         public string GetPriority()
         {
             return priority;
@@ -669,7 +783,7 @@ namespace LifeTracker
         }
 
 
-        protected private string description; //short description of acitiviy 
+        public string description; //short description of acitiviy 
         public string GetDescription()
         {
             return description;
@@ -685,7 +799,7 @@ namespace LifeTracker
 
 
         //DEBUG
-        protected private string location; //short description of acitiviy 
+        public string location;
         public string GetLocation()
         {
             return location;
@@ -696,7 +810,7 @@ namespace LifeTracker
         }
     }
 
-    class location : Event
+    /*class location : Event //DEBUG
     {
         protected private string eventname; // name of location
         public string GetEventName()
@@ -708,9 +822,9 @@ namespace LifeTracker
             eventname = EventName;
         }
 
-    }
+    }*/
 
-    class recurring : Event
+    class Recurring : Event
     {
         private protected long end_date; // end of recurring 
         public long GetEnd_Date()
@@ -737,16 +851,29 @@ namespace LifeTracker
     // Week Class
     public class Week
     {
-        protected private static List<Event> mon = new List<Event>(); //lists of events
-        protected private static List<Event> tue = new List<Event>();
-        protected private static List<Event> wed = new List<Event>();
-        protected private static List<Event> thu = new List<Event>();
-        protected private static List<Event> fri = new List<Event>();
-        protected private static List<Event> sat = new List<Event>();
-        protected private static List<Event> sun = new List<Event>();
+        public List<Event> mon; //lists of events       DEBUG <--- EVERYTHING PUBLIC SO IT CAN BE SERIALIZED
+        public List<Event> tue;
+        public List<Event> wed;
+        public List<Event> thu;
+        public List<Event> fri;
+        public List<Event> sat;
+        public List<Event> sun;
 
-        protected private List<List<Event>> a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
-        protected private long date;
+        public List<List<Event>> a_week;
+        public long date;
+
+        public Week()
+        {
+            mon = new List<Event>(); //lists of events       DEBUG <--- EVERYTHING PUBLIC SO IT CAN BE SERIALIZED
+            tue = new List<Event>();
+            wed = new List<Event>();
+            thu = new List<Event>();
+            fri = new List<Event>();
+            sat = new List<Event>();
+            sun = new List<Event>();
+
+            a_week = new List<List<Event>>() { mon, tue, wed, thu, fri, sat, sun };
+        }
 
         public void ClearWeek()
         {
@@ -828,7 +955,10 @@ namespace LifeTracker
 
     public class Calendar
     {
+        [XmlIgnore]
         private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
+
+        public List<SerializeableKeyValue<long, Week>> weeksSerializeable = new List<SerializeableKeyValue<long, Week>>(); //DEBUG <--- make this match the rest of the code
 
         public Week GetWeek(long key)
         {
@@ -894,6 +1024,13 @@ namespace LifeTracker
                 File.Create(filePath);
             }
 
+            //convert dictionary to serializable list
+            weeksSerializeable = new List<SerializeableKeyValue<long, Week>>();
+            foreach (KeyValuePair<long, Week> p in weeks)
+            {
+                weeksSerializeable.Add(new SerializeableKeyValue<long, Week>(p.Key, p.Value));
+            }
+
             System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
             System.IO.FileStream file = System.IO.File.Create(filePath);
             saver.Serialize(file, this);
@@ -913,8 +1050,30 @@ namespace LifeTracker
                 System.IO.StreamReader file = new System.IO.StreamReader(filePath);
                 var calendar = (Calendar)loader.Deserialize(file);
                 file.Close();
+
+                weeksSerializeable = calendar.weeksSerializeable;
+
+                //convert serializable list to dictionary
+                weeks = new Dictionary<long, Week>();
+                //weeks = weeksSerializeable.ToDictionary(x => x.Key, x => x.Value); //DEBUG
+                foreach (SerializeableKeyValue<long, Week> p in weeksSerializeable)
+                {
+                    if (!weeks.ContainsKey(p.Key)) weeks.Add(p.Key, p.Value);
+                }
+
                 return calendar;
             }
+        }
+    }
+    public class SerializeableKeyValue<T1, T2> //DEBUG <--- ADD TO CLASS DIAGRAMS!!!!!
+    {
+        public T1 Key { get; set; }
+        public T2 Value { get; set; }
+        public SerializeableKeyValue() { }
+        public SerializeableKeyValue(T1 t1, T2 t2)
+        {
+            Key = t1;
+            Value = t2;
         }
     }
 }

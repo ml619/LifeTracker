@@ -35,10 +35,8 @@
         <TextBlock HorizontalAlignment="Left" Margin="74,98,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
         <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,46,0,0" VerticalAlignment="Top" Width="76" Height="20" Grid.Row="2"/>
         <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,32,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
-            <ComboBox x:Name="DateList_Copy1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" Height="22"/>
         </ComboBox>
         <ComboBox x:Name="PriorityList" HorizontalAlignment="Left" Margin="84,1,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
-            <ComboBox x:Name="DateList_Copy3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" Height="22"/>
         </ComboBox>
         <Rectangle HorizontalAlignment="Left" Height="32" Margin="196,95,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFE79E8E" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="Delete_Button_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="211,100,0,0" Grid.Row="2" TextWrapping="Wrap" Text="DELETE" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Delete_Button_Click"/>

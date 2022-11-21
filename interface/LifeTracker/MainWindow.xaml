@@ -8,7 +8,7 @@
         Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight" WindowState="Maximized">
     <Viewbox Stretch="Fill">
         <Viewbox Stretch="UniformToFill">
-            <Grid Background="#E8E5FFE4" Height="453" Width="821">
+            <Grid Name="MainBackground" Background="#E8E5FFE4" Height="453" Width="821">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="63*"/>
                     <RowDefinition Height="88*"/>
@@ -25,7 +25,7 @@
                 <Rectangle HorizontalAlignment="Left" Height="50" Margin="686,62,0,0" Stroke="Black" VerticalAlignment="Top" Width="96" RadiusX="10" RadiusY="10" Fill="#FFB4DCB3"/>
                 <TextBlock HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="LifeTracker" VerticalAlignment="Top" Height="22" Width="65" TextAlignment="Center" FontSize="19" FontFamily="Freestyle Script" FontWeight="Bold" LineStackingStrategy="MaxHeight" FontStretch="Normal" LineHeight="16"/>
                 <Button Content="Add" HorizontalAlignment="Left" Margin="15,74,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="AddButtonClick"/>
-                <Button Content="Reschedule" HorizontalAlignment="Left" Margin="15,125,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold"/>
+                <Button Content="Reschedule" HorizontalAlignment="Left" Margin="15,125,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="RescheduleButtonClick"/>
                 <Button Content="Availability" HorizontalAlignment="Left" Margin="15,176,0,0" VerticalAlignment="Top" Width="55" Height="38" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Grid.RowSpan="2" Click="AvailabilityButtonClick"/>
                 <TextBlock HorizontalAlignment="Left" Margin="87,65,0,0" TextWrapping="Wrap" Text="Monday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="187,65,0,0" TextWrapping="Wrap" Text="Tuesday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
@@ -34,7 +34,7 @@
                 <TextBlock HorizontalAlignment="Left" Margin="487,65,0,0" TextWrapping="Wrap" Text="Friday" VerticalAlignment="Top" TextAlignment="Center" Width="94" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="587,65,0,0" TextWrapping="Wrap" Text="Saturday" VerticalAlignment="Top" TextAlignment="Center" Width="94" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
                 <TextBlock HorizontalAlignment="Left" Margin="687,65,0,0" TextWrapping="Wrap" Text="Sunday" VerticalAlignment="Top" TextAlignment="Center" Width="95" FontSize="13" FontWeight="Bold" FontFamily="Cambria"/>
-                <Button Content="Exit" HorizontalAlignment="Left" Margin="17,204,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFF39A9A" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="CloseButton_Click" Grid.Row="1"/>
+                <Button Content="Save &amp; Exit" HorizontalAlignment="Left" Margin="17,204,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFF39A9A" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="CloseButton_Click" Grid.Row="1"/>
                 <Button Content="Mute" Name="MuteButton" HorizontalAlignment="Left" Margin="17,160,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MuteButton_Click" Grid.Row="1"/>
                 <Button Content="Minimize" HorizontalAlignment="Left" Margin="17,182,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFFFEFA0" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MinButton_Click" Grid.Row="1"/>
                 <DatePicker SelectedDateChanged="ArrivalDatePicker_DateChanged" HorizontalAlignment="Left" Margin="100,18,0,0" VerticalAlignment="Top" Name="SelectDisplayWeek"/>
@@ -85,6 +85,8 @@
                             <TextBlock x:Name="text9pm" HorizontalAlignment="Left" Margin="39,683,0,0" TextWrapping="Wrap" Text=" 9pm                       9pm                       9pm                         9pm                     9pm                       9pm                      9pm" VerticalAlignment="Top" Width="652" Foreground="#FFE5E5E5"/>
                             <TextBlock x:Name="text10pm" HorizontalAlignment="Left" Margin="39,715,0,0" TextWrapping="Wrap" Text="10pm                     10pm                    10pm                      10pm                     10pm                     10pm                     10pm" VerticalAlignment="Top" Width="652" Foreground="#FFE5E5E5"/>
                             <TextBlock x:Name="text11pm" HorizontalAlignment="Left" Margin="39,748,0,0" TextWrapping="Wrap" Text="11pm                     11pm                    11pm                      11pm                     11pm                     11pm                     11pm" VerticalAlignment="Top" Width="652" Foreground="#FFE5E5E5"/>
+                            <Rectangle x:Name="AcceptSuggestionButton" Grid.ZIndex="2" HorizontalAlignment="Left" Height="21" Margin="51,19,0,0" Stroke="#FF086C19" VerticalAlignment="Top" Width="21" Fill="#FF2DFF00" RadiusX="15" RadiusY="12" StrokeThickness="2" MouseLeftButtonDown="Accept_Button_Click"/>
+                            <Rectangle x:Name="RejectSuggestionButton" Grid.ZIndex="2" HorizontalAlignment="Left" Height="21" Margin="77,19,0,0" Stroke="#FF6C0808" VerticalAlignment="Top" Width="21" Fill="Red" RadiusX="15" RadiusY="12" StrokeThickness="2" MouseLeftButtonDown="Reject_Button_Click"/>
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

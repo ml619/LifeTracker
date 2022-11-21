@@ -35,10 +35,8 @@
         <TextBlock HorizontalAlignment="Center" Margin="0,81,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
         <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,46,0,0" VerticalAlignment="Top" Width="76" Height="20" Grid.Row="2"/>
         <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,32,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
-            <ComboBox x:Name="DateList_Copy1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" Height="22"/>
         </ComboBox>
         <ComboBox x:Name="PriorityList" HorizontalAlignment="Left" Margin="84,1,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
-            <ComboBox x:Name="DateList_Copy3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" Height="22"/>
         </ComboBox>
     </Grid>
 </Window>
