@@ -12,8 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Timers;
+using System.Threading;
 using System.IO;
+using System.Diagnostics;
 
 
 namespace LifeTracker
@@ -23,13 +24,15 @@ namespace LifeTracker
         // Public variables
         public Dictionary<TextBlock, Event> textToEvent = new Dictionary<TextBlock, Event>();
         public Dictionary<TextBlock, Rectangle> textToBlock = new Dictionary<TextBlock, Rectangle>();
-        public Dictionary<TextBlock, Timer> textToTimer = new Dictionary<TextBlock, Timer>();
+        public Dictionary<TextBlock, System.Windows.Threading.DispatcherTimer> textToTimer = new Dictionary<TextBlock, System.Windows.Threading.DispatcherTimer>();
 
         public DateTime displayStartOfWeek = DateTime.Today;
         public Week currentWeek = new Week();
         public Calendar calendar = new Calendar();
 
-        string saveFileName = "Storage.json";
+        string saveFileName = "Storage.xml";
+
+        bool muteCheck = false;
 
         // MainWindow Initialization
         public MainWindow()
@@ -46,6 +49,15 @@ namespace LifeTracker
             currentWeek = calendar.GetWeek(curWeekEpoch);
         }
 
+        // Mute Window
+        private void MuteButton_Click(object sender, RoutedEventArgs e)
+        {
+            //toggle bool
+            muteCheck = !muteCheck;
+            //update button text
+            if (muteCheck) MuteButton.Content = "Unmute";
+            else MuteButton.Content = "Mute";
+        }
         // Close Window
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -85,7 +97,7 @@ namespace LifeTracker
             for (int i = 0; i < 7; i++)
             {
                 List<Event> dayInWeek = currentWeek.GetWeek()[i];
-                for(int j = 0; j < dayInWeek.Count; j++)
+                for (int j = 0; j < dayInWeek.Count; j++)
                 {
                     AddEventToDisplay(dayInWeek[j]);
                 }
@@ -183,8 +195,6 @@ namespace LifeTracker
         {
             //Add event into week object
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
-            //DateTime dateTime = dateTimeOffset.DateTime;
-            //currentWeek.AddEvent(curEvent, (int)dateTime.DayOfWeek); -DEBUG <---- NEEDED?
 
             //Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
@@ -235,12 +245,12 @@ namespace LifeTracker
             int ms = (int)ts.TotalMilliseconds;
 
             // Create a timer with interval in ms (edge case check if time is negative)
-            Timer timer = new Timer();
+            System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
             if (ms > 0)
             {
-                timer = new Timer(ms);
-                timer.Elapsed += (sender, e) => OnTimedEvent(sender, e, curEvent);
-                timer.Enabled = true;
+                timer.Tick += (sender, e) => OnTimedEvent(sender, e, curEvent);
+                timer.Interval = new TimeSpan(0, 0, 0, 0, ms);
+                timer.Start();
             }
             else timer = null;
 
@@ -250,13 +260,20 @@ namespace LifeTracker
             textToTimer.Add(txtblk, timer);
         }
         // Open reminder pop-up when timer event occurs
-        private void OnTimedEvent(Object source, ElapsedEventArgs e, Event curEvent)
+        private void OnTimedEvent(Object source, EventArgs e, Event curEvent)
         {
             // Put up pop-up window
-            ReminderWindow reminder = new ReminderWindow();
-            reminder.EventName.Text = curEvent.GetName();
-            reminder.EventStart.Text = curEvent.GetDate_Time().ToString("HH:mm");
-            reminder.Show();
+            if (!muteCheck)
+            {
+                ReminderWindow reminder = new ReminderWindow();
+                reminder.EventName.Text = curEvent.GetName();
+
+                DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
+                reminder.EventStart.Text = (dateTimeOffset.DateTime).ToString("HH:mm");
+
+                reminder.EventLocation.Text = curEvent.GetLocation().ToString(); //DEBUG
+                reminder.Show();
+            }
         }
         // Clear Events From Display, Clear Events Stored in Temporary Memory
         private void ClearDisplayAndStoredEvents()
@@ -272,7 +289,7 @@ namespace LifeTracker
             }
             textToEvent = new Dictionary<TextBlock, Event>();
             textToBlock = new Dictionary<TextBlock, Rectangle>();
-            textToTimer = new Dictionary<TextBlock, Timer>();
+            textToTimer = new Dictionary<TextBlock, System.Windows.Threading.DispatcherTimer>();
 
             currentWeek = new Week();
             currentWeek.ClearWeek();
@@ -353,6 +370,9 @@ namespace LifeTracker
             retEvent.SetFlexibility(createWin.FlexibilityList.SelectedIndex + 1);
             retEvent.SetPriority(createWin.PriorityList.Text);
             retEvent.SetDescription(createWin.DescriptionInput.Text);
+
+            retEvent.SetLocation(createWin.LocationInput.Text); //DEBUG
+
             return retEvent;
         }
         // Edit Event in Calendar from User Input, Update Display
@@ -387,6 +407,8 @@ namespace LifeTracker
             editWin.YearList.Text = dateTime.ToString("yyyy");
             editWin.ColorList.Text = selectedEvent.GetColor();
             editWin.DescriptionInput.Text = selectedEvent.GetDescription();
+
+            editWin.LocationInput.Text = selectedEvent.GetLocation(); //DEBUG
 
             editWin.ShowDialog();
 
@@ -424,6 +446,8 @@ namespace LifeTracker
             retEvent.SetFlexibility(editWin.FlexibilityList.SelectedIndex + 1);
             retEvent.SetPriority(editWin.PriorityList.Text);
             retEvent.SetDescription(editWin.DescriptionInput.Text);
+
+            retEvent.SetLocation(editWin.LocationInput.Text); //DEBUG
 
             return retEvent;
         }
@@ -559,6 +583,17 @@ namespace LifeTracker
             //return final date
             return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
         }
+
+
+
+
+
+
+
+        private void AvailabilityButtonClick(object sender, RoutedEventArgs e)
+        {
+            currentWeek.ExportAvailability();
+        }
     }
 
 
@@ -612,7 +647,7 @@ namespace LifeTracker
         }
 
 
-        protected private double duration; //in terms of hours
+        protected private double duration; //in terms of number of hours (NOT epoch)
         public double GetDuration()
         {
             return duration;
@@ -642,6 +677,22 @@ namespace LifeTracker
         public void SetDescription(string Description)
         {
             description = Description;
+        }
+
+
+
+
+
+
+        //DEBUG
+        protected private string location; //short description of acitiviy 
+        public string GetLocation()
+        {
+            return location;
+        }
+        public void SetLocation(string Location)
+        {
+            location = Location;
         }
     }
 
@@ -706,7 +757,7 @@ namespace LifeTracker
             fri = new List<Event>();
             sat = new List<Event>();
             sun = new List<Event>();
-    }
+        }
 
         public long GetDate()
         {
@@ -731,6 +782,44 @@ namespace LifeTracker
         public void DeleteEvent(Event event1, int day)
         {
             a_week[day].Remove(event1);
+        }
+        public void ExportAvailability()
+        {
+            // create a file to write to 
+            string fileName = "Availability.txt";
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            using (StreamWriter sw = File.CreateText(fileName))
+            {
+                for (int i = 0; i <= 6; i++)
+                {
+                    List<string> days = new List<string>
+                    { "Monday\n", "\n\nTuesday\n", "\n\nWednesday\n", "\n\nThursday\n", "\n\nFriday\n", "\n\nSaturday\n", "\n\nSunday\n" };
+                    sw.WriteLine(days[i]);
+                    for (int j = 0; j < a_week[(i + 1) % 7].Count; j++)
+                    {
+                        long epochSeconds = a_week[(i + 1) % 7][j].GetDate_Time();
+                        long epochDuration = (long)(a_week[(i + 1) % 7][j].GetDuration() * 3600);
+
+                        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
+                        DateTime dateTime = dateTimeOffset.DateTime;
+                        string startTime = dateTime.ToString("HH:mm");
+
+                        long endtimeepoch = epochSeconds + epochDuration;
+                        dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(endtimeepoch);
+                        dateTime = dateTimeOffset.DateTime;
+                        string endTime = dateTime.ToString("HH:mm");
+
+                        sw.WriteLine(startTime + " to " + endTime + ",");
+                    }
+                }
+            }
+
+            //open file once written to
+            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
     }
 

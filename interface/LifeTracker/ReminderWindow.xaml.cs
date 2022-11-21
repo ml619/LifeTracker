@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace LifeTracker
 {
@@ -19,16 +20,19 @@ namespace LifeTracker
     /// </summary>
     public partial class ReminderWindow : Window
     {
+        private protected System.Media.SoundPlayer player = new System.Media.SoundPlayer("Meeting Reminder.wav");
         public ReminderWindow()
         {
             InitializeComponent();
 
             // Play sound
-            System.Media.SoundPlayer player = new System.Media.SoundPlayer(@"Meeting Reminder.mp3");
             player.Play();
         }
         private void Okay_Button_Click(object sender, RoutedEventArgs e)
         {
+            // Stop sound
+            player.Stop();
+
             // Close create window.
             this.Close();
         }

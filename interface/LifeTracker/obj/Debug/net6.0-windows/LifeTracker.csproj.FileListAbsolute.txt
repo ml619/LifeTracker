@@ -48,3 +48,6 @@ C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-wi
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\EditEventWindow.baml
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ReminderWindow.g.cs
 C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ReminderWindow.baml
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Meeting Reminder.mp3
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker_Content.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Meeting Reminder.wav

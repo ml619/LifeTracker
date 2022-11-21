@@ -21,7 +21,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="12,65,0,0" TextWrapping="Wrap" Text="Location:" VerticalAlignment="Top" Grid.Row="1"/>
         <TextBlock HorizontalAlignment="Left" Margin="12,94,0,0" TextWrapping="Wrap" Text="Description:" VerticalAlignment="Top" Grid.Row="1"/>
         <TextBlock HorizontalAlignment="Left" Margin="12,48,0,0" TextWrapping="Wrap" Text="Color:" VerticalAlignment="Top" Grid.Row="2"/>
-        <TextBox HorizontalAlignment="Left" Margin="84,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Grid.Row="1"/>
+        <TextBox x:Name="LocationInput" HorizontalAlignment="Left" Margin="84,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Grid.Row="1"/>
         <TextBox x:Name="DescriptionInput" HorizontalAlignment="Left" Margin="84,94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" Height="75" Grid.RowSpan="2" Grid.Row="1"/>
         <ComboBox x:Name="TimeList1" HorizontalAlignment="Left" Margin="84,35,0,0" VerticalAlignment="Top" Width="65" Height="21"/>
         <TextBlock HorizontalAlignment="Left" Margin="208,28,0,0" TextWrapping="Wrap" Text="-" VerticalAlignment="Top" FontSize="22" Height="29"/>
