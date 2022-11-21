@@ -595,7 +595,7 @@ class recurring : Event
 }
 
 // Week Class
-public class week
+public class Week
 {
     protected private static List<Event> mon = new List<Event>(); //lists of events
     protected private static List<Event> tue = new List<Event>();

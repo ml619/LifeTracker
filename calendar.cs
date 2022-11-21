@@ -1,3 +1,5 @@
+using System;
+
 class Calendar
 {
     private Dictionary<long, Week> weeks;
@@ -59,24 +61,53 @@ class Calendar
 
     public Event reschedule(Event event, Week week)
     {
-        //my fancy algorithm
-        int score;
+        Dictionary<Event,long> scores = new Dictionary<Event,long>();
+        foreach(List<Event> day in week)
+        {
+            Event tryevent = new Event();
+            tryevent.SetName(event.GetName());
 
-        int dateScore = (event.GetDate_Time() * event.GetPriority());
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(event.GetDate_Time());
+            DateTime dateTime = dateTimeOffset.DateTime;
+            dateTime.AddHours(1.0);
+            TimeSpan t = dateTime - new DateTime(1970, 1, 1);
+            long curWeekEpoch = (long)t.TotalSeconds;
+            tryevent.SetDate_Time(curWeekEpoch);
+
+            tryevent.SetFlexibility(event.GetFlexibility());
+            tryevent.SetColor(event.GetColor());
+            tryevent.SetPriority(event.GetPriority());
+            tryevent.SetDescription(event.GetDescription());
+
+            //addhours and days and such
+        }
+        //return Event with highest Score
+    }
+
+
+
+    private calculateScore(Event event, List<Event> day)
+    {
+        //my fancy algorithm
+        long score;
+
+        long dateScore = event.GetDate_Time() - Math.Abs(event.GetDate_Time().Hour - 12);
         
         int priorityScore;
-        if(event.GetPriority == "LOW")
+        if(event.GetPriority() == "LOW")
             priorityScore = 3;
-        else if(event.GetPriority == "MED")
+        else if(event.GetPriority() == "MED")
             priorityScore = 2;
         else
             priorityScore = 1;
 
-        priorityScore = priorityScore/100;
+        int flexScore = event.GetFlexibility();
 
-        int flexScore = event.GetFlexibility;
-
-        int locationScore = 0; //complete later!
+        int locationScore = 0;
+        //if(event.GetType() == typeof (location))
+            foreach(Event anevent in day)
+                if(anevent.GetLocation().Equals(event.GetLocation()))
+                    locationScore++;
 
         score = dateScore + priorityScore + flexScore + locationScore;
     }
