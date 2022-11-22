@@ -11,8 +11,8 @@
         <TextBlock x:Name="EventName" HorizontalAlignment="Center" Margin="0,71,0,0" TextWrapping="Wrap" Text="event_name_here" VerticalAlignment="Top" FontWeight="Bold" FontSize="30"/>
         <TextBlock x:Name="EventStart" HorizontalAlignment="Center" TextWrapping="Wrap" Text="time here" VerticalAlignment="Center" FontSize="16"/>
         <TextBlock x:Name="EventLocation" HorizontalAlignment="Center" TextWrapping="Wrap" Text="set to ' ' if none" VerticalAlignment="Top" FontSize="16" Margin="0,174,0,0"/>
-        <Rectangle HorizontalAlignment="Left" Height="32" Margin="152,229,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" MouseLeftButtonDown="Okay_Button_Click"/>
-        <TextBlock HorizontalAlignment="Left" Margin="178,233,0,0" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
+        <Rectangle HorizontalAlignment="Left" Height="32" Margin="152,229,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" MouseLeftButtonDown="OkayButtonClick"/>
+        <TextBlock HorizontalAlignment="Left" Margin="178,233,0,0" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="OkayButtonClick"/>
 
     </Grid>
 </Window>

@@ -501,7 +501,7 @@ namespace LifeTracker {
             case 5:
             
             #line 37 "..\..\..\MainWindow.xaml"
-            ((System.Windows.Controls.Button)(target)).Click += new System.Windows.RoutedEventHandler(this.CloseButton_Click);
+            ((System.Windows.Controls.Button)(target)).Click += new System.Windows.RoutedEventHandler(this.CloseButtonClick);
             
             #line default
             #line hidden
@@ -510,7 +510,7 @@ namespace LifeTracker {
             this.MuteButton = ((System.Windows.Controls.Button)(target));
             
             #line 38 "..\..\..\MainWindow.xaml"
-            this.MuteButton.Click += new System.Windows.RoutedEventHandler(this.MuteButton_Click);
+            this.MuteButton.Click += new System.Windows.RoutedEventHandler(this.MuteButtonClick);
             
             #line default
             #line hidden
@@ -518,7 +518,7 @@ namespace LifeTracker {
             case 7:
             
             #line 39 "..\..\..\MainWindow.xaml"
-            ((System.Windows.Controls.Button)(target)).Click += new System.Windows.RoutedEventHandler(this.MinButton_Click);
+            ((System.Windows.Controls.Button)(target)).Click += new System.Windows.RoutedEventHandler(this.MinButtonClick);
             
             #line default
             #line hidden
@@ -683,7 +683,7 @@ namespace LifeTracker {
             this.AcceptSuggestionButton = ((System.Windows.Shapes.Rectangle)(target));
             
             #line 88 "..\..\..\MainWindow.xaml"
-            this.AcceptSuggestionButton.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Accept_Button_Click);
+            this.AcceptSuggestionButton.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.AcceptButtonClick);
             
             #line default
             #line hidden
@@ -692,7 +692,7 @@ namespace LifeTracker {
             this.RejectSuggestionButton = ((System.Windows.Shapes.Rectangle)(target));
             
             #line 89 "..\..\..\MainWindow.xaml"
-            this.RejectSuggestionButton.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Reject_Button_Click);
+            this.RejectSuggestionButton.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.RejectButtonClick);
             
             #line default
             #line hidden

@@ -31,8 +31,8 @@
         <ComboBox x:Name="MonthList" HorizontalAlignment="Left" Margin="84,63,0,0" VerticalAlignment="Top" Width="76" Height="22"/>
         <ComboBox x:Name="DayList" HorizontalAlignment="Left" Margin="165,61,0,0" VerticalAlignment="Top" Width="52" Height="24"/>
         <ComboBox x:Name="YearList" HorizontalAlignment="Left" Margin="222,62,0,0" VerticalAlignment="Top" Width="73" Height="24"/>
-        <Rectangle HorizontalAlignment="Center" Height="32" Margin="0,89,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="Okay_Button_Click"/>
-        <TextBlock HorizontalAlignment="Center" Margin="0,93,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="Okay_Button_Click"/>
+        <Rectangle HorizontalAlignment="Center" Height="32" Margin="0,89,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="OkayButtonClick"/>
+        <TextBlock HorizontalAlignment="Center" Margin="0,93,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="OkayButtonClick"/>
         <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,160,0,0" VerticalAlignment="Top" Width="76" Height="20" Grid.Row="1" Grid.RowSpan="2"/>
         <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,10,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
         </ComboBox>

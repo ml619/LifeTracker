@@ -49,10 +49,10 @@ namespace LifeTracker
             InitializeComponent();
             SelectDisplayWeek.SelectedDate = DateTime.Today;
 
-            //load JSON data
+            // Load JSON data
             calendar.LoadXML(saveFileName);
 
-            //set current week to corresponding data in calendar
+            // Set current week to corresponding data in calendar
             TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
             long curWeekEpoch = (long)t.TotalSeconds;
             currentWeek = calendar.GetWeek(curWeekEpoch);
@@ -70,28 +70,28 @@ namespace LifeTracker
                 }
             }
 
-            //set accept/reject buttons to default hidden (off screen)
+            // Set accept/reject buttons to default hidden (off screen)
             AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
             RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
         }
 
         // Mute Window
-        private void MuteButton_Click(object sender, RoutedEventArgs e)
+        private void MuteButtonClick(object sender, RoutedEventArgs e)
         {
-            //toggle bool
+            // Toggle bool
             muteCheck = !muteCheck;
-            //update button text
+            // Update button text
             if (muteCheck) MuteButton.Content = "Unmute";
             else MuteButton.Content = "Mute";
         }
         // Close Window
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        private void CloseButtonClick(object sender, RoutedEventArgs e)
         {
             calendar.SaveXML(saveFileName);
             Close();
         }
         // Minimize Window
-        private void MinButton_Click(object sender, RoutedEventArgs e)
+        private void MinButtonClick(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
         }
@@ -106,7 +106,6 @@ namespace LifeTracker
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            //calendar.SaveXML(saveFileName); DEBUG
 
             // Set week with Monday at the start.
             displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
@@ -149,7 +148,6 @@ namespace LifeTracker
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            //calendar.SaveXML(saveFileName); DEBUG
 
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(7);
@@ -178,7 +176,6 @@ namespace LifeTracker
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            //calendar.SaveXML(saveFileName); DEBUG
 
             // Update display and week being accessed.
             displayStartOfWeek = displayStartOfWeek.AddDays(-7);
@@ -220,19 +217,19 @@ namespace LifeTracker
         // Add an Event to the Display
         private void AddEventToDisplay(Event curEvent)
         {
-            //Add event into week object
+            // Add event into week object
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
 
-            //Set x margin to correspond to day of week
+            // Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time()).DateTime;
             int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
             if (x_margin < 0) x_margin = 606;
 
-            //Set y_margin to correspond to time during day
-            //each 1/4 hour = 8 units
+            // Set y_margin to correspond to time during day
+            // Each 1/4 hour = 8 units
             int y_margin = 8 * (ConvertTimeToHeightNumber(datetime)) + 11;
 
-            //Create Rectangle
+            // Create Rectangle
             Rectangle rec = new Rectangle()
             {
                 Width = 95, //set width
@@ -247,7 +244,7 @@ namespace LifeTracker
             };
             rec.MouseDown += new MouseButtonEventHandler(EditEventClick);
 
-            //Create Textblock
+            // Create Textblock
             TextBlock txtblk = new TextBlock()
             {
                 Text = curEvent.GetName(),
@@ -263,7 +260,7 @@ namespace LifeTracker
             Scroll_Area.Children.Add(rec);
             Scroll_Area.Children.Add(txtblk);
 
-            //Create Timer
+            // Create Timer
             // Calculate ms between current time and start time (account for 30 minutes beforehand)
             dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
             DateTime date2 = (dateTimeOffset.DateTime).AddMinutes(-30);
@@ -321,7 +318,7 @@ namespace LifeTracker
             currentWeek = new Week();
             currentWeek.ClearWeek();
         }
-        //Calculate corresponding height value (display attribute) to duration of Event (stored value)
+        // Calculate corresponding height value (display attribute) to duration of Event (stored value)
         private int ConvertTimeToHeightNumber(DateTime inputTime)
         {
             int retNum = 0;
@@ -360,17 +357,17 @@ namespace LifeTracker
             DateTime endDate = startDate.AddDays(7);
             if (startDate <= inputDate && inputDate < endDate)
             {
-                //Add event into week object
+                // Add event into week object
                 dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
                 DateTime dateTime = dateTimeOffset.DateTime;
                 currentWeek.AddEvent(tempEvent, (int)dateTime.DayOfWeek);
 
-                //Add event to display
+                // Add event to display
                 AddEventToDisplay(tempEvent);
             }
             else
             {
-                //Look for correct week to add event to, do NOT add to current display
+                // Look for correct week to add event to, do NOT add to current display
                 DateTime dateTime = dateTimeOffset.DateTime;
 
                 int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
@@ -384,10 +381,10 @@ namespace LifeTracker
             }
 
 
-            //If recurring event, add to subsequent weeks afterwards
+            // If recurring event, add to subsequent weeks afterwards
             if (tempEvent.GetType() == typeof(Recurring))
             {
-                //increment by step until fulfilled all instances (minus current one)
+                // Increment by step until fulfilled all instances (minus current one)
                 for(int i = 0; i < ((Recurring)tempEvent).GetNumInstances() - 1; i++)
                 {
                     //Look for correct week to add event to, do NOT add to current display
@@ -409,7 +406,7 @@ namespace LifeTracker
         {
             Event retEvent = new Event();
 
-            //check whether recurring event or not
+            // Check whether recurring event or not
             if (!(bool)createWin.RecurringCheck.IsChecked) retEvent = new Event();
             else
             {
@@ -420,7 +417,7 @@ namespace LifeTracker
                 retEvent = tempEvent;
             }
 
-            //duration stored in terms of hours (i.e. 1 hours, 1.25 hours, etc.)
+            // Duration stored in terms of hours (i.e. 1 hours, 1.25 hours, etc.)
             retEvent.SetName(createWin.TitleInput.Text);
             retEvent.SetDate_Time(EpochTimeConversion(ref createWin));
             retEvent.SetDuration(HoursDifferenceConversion(ref createWin));
@@ -438,10 +435,10 @@ namespace LifeTracker
         {
             if (suggestMode) //check if in suggest mode
             {
-                //set original event
+                // Set original event
                 originalEvent = textToEvent[(TextBlock)sender];
 
-                //mark that an event has been clicked
+                // Mark that an event has been clicked
                 tcs1?.TrySetResult(true);
 
                 return; //exit (do not carry out edit event protocol)
@@ -484,12 +481,12 @@ namespace LifeTracker
             // Create new event (unless should be deleted OR duration is negative)
             if (editWin.deleteEventBool == false)
             {
-                //Add event into week object
+                // Add event into week object
                 dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(EditEvent(ref editWin).GetDate_Time());
                 dateTime = dateTimeOffset.DateTime;
                 currentWeek.AddEvent(EditEvent(ref editWin), (int)dateTime.DayOfWeek);
 
-                //Add event to display
+                // Add event to display
                 AddEventToDisplay(EditEvent(ref editWin));
             }
 
@@ -515,8 +512,7 @@ namespace LifeTracker
             retEvent.SetFlexibility(editWin.FlexibilityList.SelectedIndex + 1);
             retEvent.SetPriority(editWin.PriorityList.Text);
             retEvent.SetDescription(editWin.DescriptionInput.Text);
-
-            retEvent.SetLocation(editWin.LocationInput.Text); //DEBUG
+            retEvent.SetLocation(editWin.LocationInput.Text);
 
             return retEvent;
         }
@@ -559,10 +555,11 @@ namespace LifeTracker
             return ((double)t.TotalSeconds) / 3600;
         }
 
+        // Convert user window input into DateTime class (New Event Created)
         private DateTime UserInputToDateTime(ref CreateEventWindow createWin, int startOrEnd)
         {
             {
-                //convert from 12 to 24 hour time (based on either start or end time)
+                // Convert from 12 to 24 hour time (based on either start or end time)
                 String time12To24;
                 int temp;
                 if (startOrEnd == 1)
@@ -592,24 +589,25 @@ namespace LifeTracker
                     }
                 }
 
-                //convert 0 to 12 in hour
+                // Convert 0 to 12 in hour
                 if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
-                //convert user input to date
+                // Convert user input to date
                 String MonthListString = (createWin.MonthList.SelectedIndex + 1).ToString();
                 if ((createWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (createWin.MonthList.SelectedIndex + 1).ToString(); }
                 String DayListString = (createWin.DayList.SelectedIndex + 1).ToString();
                 if ((createWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (createWin.DayList.SelectedIndex + 1).ToString(); }
                 String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
 
-                //return final date
+                // Return final date
                 return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
 
+        // Convert user window input into DateTime class (Existing Event Edited)
         private DateTime UserInputToDateTime(ref EditEventWindow editWin, int startOrEnd)
         {
-            //convert from 12 to 24 hour time (based on either start or end time)
+            // Convert from 12 to 24 hour time (based on either start or end time)
             String time12To24;
             int temp;
             if (startOrEnd == 1)
@@ -639,17 +637,17 @@ namespace LifeTracker
                 }
             }
 
-            //convert 0 to 12 in hour
+            // Convert 0 to 12 in hour
             if (time12To24.Substring(0, 2) == "0:") time12To24 = "12" + time12To24.Substring(1);
 
-            //convert user input to date
+            // Convert user input to date
             String MonthListString = (editWin.MonthList.SelectedIndex + 1).ToString();
             if ((editWin.MonthList.SelectedIndex + 1).ToString().Length == 1) { MonthListString = "0" + (editWin.MonthList.SelectedIndex + 1).ToString(); }
             String DayListString = (editWin.DayList.SelectedIndex + 1).ToString();
             if ((editWin.DayList.SelectedIndex + 1).ToString().Length == 1) { DayListString = "0" + (editWin.DayList.SelectedIndex + 1).ToString(); }
             String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
 
-            //return final date
+            // Return final date
             return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
         }
 
@@ -662,11 +660,11 @@ namespace LifeTracker
         {
             if (suggestMode)
             {
-                //mark that exiting reschedule mode
+                // Mark that exiting reschedule mode
                 tcs2?.TrySetResult(true);
                 suggestMode = false;
 
-                //hide buttons again, clear suggest event, revert display background color
+                // Hide buttons again, clear suggest event, revert display background color
                 AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
                 RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
                 suggestedEvent = null;
@@ -678,37 +676,37 @@ namespace LifeTracker
 
             suggestMode = true;
 
-            //change display background color
+            // Change display background color
             MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8126C0F");
 
-            //wait for event to be selected
+            // Wait for event to be selected
             tcs1 = new TaskCompletionSource<bool>();
             await tcs1.Task;
 
-            //add suggested event to display (NOT to week object yet)
+            // Add suggested event to display (NOT to week object yet)
             suggestedEvent = calendar.GetSuggestion(originalEvent, currentWeek);
 
-            //display suggestion
+            // Display suggestion
             AddEventToDisplay(suggestedEvent);
 
-            //add accept/reject buttons to display, do not allow any other actions until one is clicked]
-            //Set x margin to correspond to day of week
+            // Add accept/reject buttons to display, do not allow any other actions until one is clicked]
+            // Set x margin to correspond to day of week
             DateTime datetime = DateTimeOffset.FromUnixTimeSeconds(suggestedEvent.GetDate_Time()).DateTime;
             int x_margin = 100 * ((int)datetime.DayOfWeek - 1) + 6;
             if (x_margin < 0) x_margin = 606;
 
-            //Set y_margin to correspond to time during day
-            //each 1/4 hour = 8 units
+            // Set y_margin to correspond to time during day
+            // Each 1/4 hour = 8 units
             int y_margin = 8 * (ConvertTimeToHeightNumber(datetime)) + 11;
 
             AcceptSuggestionButton.Margin = new Thickness(x_margin + 43, y_margin + 3, 0, 0);
             RejectSuggestionButton.Margin = new Thickness(x_margin + 69, y_margin + 3, 0, 0);
 
-            //wait for accept/reject to be pressed
+            // Wait for accept/reject to be pressed
             tcs2 = new TaskCompletionSource<bool>();
             await tcs2.Task;
 
-            //hide buttons again, clear suggest event, revert display background color
+            // Hide buttons again, clear suggest event, revert display background color
             AcceptSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
             RejectSuggestionButton.Margin = new Thickness(-100, -100, 0, 0);
             suggestedEvent = null;
@@ -717,32 +715,26 @@ namespace LifeTracker
         }
 
 
-        private void Accept_Button_Click(object sender, RoutedEventArgs e)
+        private void AcceptButtonClick(object sender, RoutedEventArgs e)
         {
-            //mark that an accept has been chosen
+            // Mark that an accept has been chosen
             tcs2?.TrySetResult(true);
 
-            //add suggested event to week DEBUG --ABBY
-            //Add event into week object
+            // Add suggested event into week object
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(suggestedEvent.GetDate_Time());
             DateTime dateTime = dateTimeOffset.DateTime;
             currentWeek.AddEvent(suggestedEvent, (int)dateTime.DayOfWeek);
 
-            //remove original event (from display and week) & suggested event (non-finalized version)
+            // Remove original event (from display and week) & suggested event (non-finalized version)
             dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(originalEvent.GetDate_Time());
             dateTime = dateTimeOffset.DateTime;
             currentWeek.DeleteEvent(originalEvent, (int)dateTime.DayOfWeek);
 
-
-
-
-
-            //RELOAD EVERYTHING
+            // Reload all
             // Save current week data to calendar & JSON
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            //calendar.SaveXML(saveFileName); DEBUG
 
             // Set week with Monday at the start.
             displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
@@ -766,29 +758,19 @@ namespace LifeTracker
                 }
             }
 
-
-
-
+            // Exit suggest mode
             suggestMode = false;
         }
-        private void Reject_Button_Click(object sender, RoutedEventArgs e)
+        private void RejectButtonClick(object sender, RoutedEventArgs e)
         {
-            //mark that an reject has been chosen
+            // Mark that an reject has been chosen
             tcs2?.TrySetResult(true);
 
-            //remove suggested event from display DEBUG --ABBY
-
-
-
-
-
-
-            //RELOAD EVERYTHING
+            // Reload all
             // Save current week data to calendar & JSON
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
             calendar.RemoveWeek((long)t.TotalSeconds);
             calendar.AddWeek(currentWeek);
-            //calendar.SaveXML(saveFileName); DEBUG
 
             // Set week with Monday at the start.
             displayStartOfWeek = FindNearestMonday(SelectDisplayWeek.SelectedDate.Value);
@@ -812,10 +794,7 @@ namespace LifeTracker
                 }
             }
 
-
-
-
-
+            // Exit suggest mode
             suggestMode = false;
         }
     }
@@ -824,10 +803,10 @@ namespace LifeTracker
     //CLASSES
 
     // Event Classes
-    public class Event //description, priority, time, color, flexibility
+    public class Event // (items are public for sake of serialization)
     {
 
-        public string name; // name of event
+        public string name; // Name of event
         public string GetName()
         {
             return name;
@@ -838,7 +817,7 @@ namespace LifeTracker
         }
 
 
-        public long date_time; //date and time in epoch
+        public long date_time; // Date and time in epoch
         public long GetDate_Time()
         {
             return date_time;
@@ -849,7 +828,7 @@ namespace LifeTracker
         }
 
 
-        public int flexibility;
+        public int flexibility; // How easilt event can be moved
         public int GetFlexibility()
         {
             return flexibility;
@@ -860,7 +839,7 @@ namespace LifeTracker
         }
 
 
-        public string color; // color of event
+        public string color; // Color of event on display
         public string GetColor()
         {
             return color;
@@ -871,7 +850,7 @@ namespace LifeTracker
         }
 
 
-        public double duration; //in terms of number of hours (NOT epoch)
+        public double duration; // In terms of number of hours (NOT epoch)
         public double GetDuration()
         {
             return duration;
@@ -882,7 +861,7 @@ namespace LifeTracker
         }
 
 
-        public string priority;
+        public string priority; // How soon the event should be completed
         public string GetPriority()
         {
             return priority;
@@ -893,7 +872,7 @@ namespace LifeTracker
         }
 
 
-        public string description; //short description of acitiviy 
+        public string description; // Short description of activity 
         public string GetDescription()
         {
             return description;
@@ -903,13 +882,7 @@ namespace LifeTracker
             description = Description;
         }
 
-
-
-
-
-
-        //DEBUG
-        public string location;
+        public string location; // Where the event takes place
         public string GetLocation()
         {
             return location;
@@ -919,32 +892,9 @@ namespace LifeTracker
             location = Location;
         }
     }
-
-    /*class location : Event //DEBUG
-    {
-        protected private string eventname; // name of location
-        public string GetEventName()
-        {
-            return eventname;
-        }
-        public void SetEventName(string EventName)
-        {
-            eventname = EventName;
-        }
-
-    }*/
-
-
-
-
-    //from week that initial one is inserted on, traverse forwards until the end day, by step, adding to the individual calendars on that week
-    //if week doesn't exist, should be added (keep track of the mondays) DEBUG
-
-
-
     class Recurring : Event
     {
-        public int numInstances; // how many events there are //DEBUG <---- CHANGED FROM THE CLASS DIAGRAM
+        public int numInstances; // How many events there are
         public long GetNumInstances()
         {
             return numInstances;
@@ -954,7 +904,7 @@ namespace LifeTracker
             numInstances = NumInstances;
         }
 
-        public int step; //how often 
+        public int step; // How often events occur 
         public int GetStep()
         {
             return step;
@@ -968,7 +918,7 @@ namespace LifeTracker
     // Week Class
     public class Week
     {
-        public List<Event> mon; //lists of events       DEBUG <--- EVERYTHING PUBLIC SO IT CAN BE SERIALIZED
+        public List<Event> mon; // Lists of events (public for sake of serialization)
         public List<Event> tue;
         public List<Event> wed;
         public List<Event> thu;
@@ -981,7 +931,7 @@ namespace LifeTracker
 
         public Week()
         {
-            mon = new List<Event>(); //lists of events       DEBUG <--- EVERYTHING PUBLIC SO IT CAN BE SERIALIZED
+            mon = new List<Event>(); // Lists of events
             tue = new List<Event>();
             wed = new List<Event>();
             thu = new List<Event>();
@@ -993,7 +943,7 @@ namespace LifeTracker
         }
         public void ClearWeek()
         {
-            mon = new List<Event>(); //lists of events
+            mon = new List<Event>(); // Lists of events
             tue = new List<Event>();
             wed = new List<Event>();
             thu = new List<Event>();
@@ -1002,39 +952,39 @@ namespace LifeTracker
             sun = new List<Event>();
         }
 
-        public long GetDate()
+        public long GetDate() // Return epoch date defining the week (Monday of week)
         {
             return date;
         }
-
         public void SetDate(long inputDate)
         {
             date = inputDate;
         }
 
-        public List<List<Event>> GetWeek()
+        public List<List<Event>> GetWeek() // Return list (week) of lists (days) of events
         {
             return a_week;
         }
 
-        public void AddEvent(Event event1, int day)
+        public void AddEvent(Event event1, int day) // Add individual event into week
         {
             a_week[day].Add(event1);
         }
-
-        public void DeleteEvent(Event event1, int day)
+        public void DeleteEvent(Event event1, int day) // Remove individual event from week
         {
             a_week[day].Remove(event1);
         }
-        public void ExportAvailability()
+
+        public void ExportAvailability() // Export times of events into text file
         {
-            // create a file to write to 
+            // Create a file to write to (as applicable)
             string fileName = "Availability.txt";
             if (File.Exists(fileName))
             {
                 File.Delete(fileName);
             }
 
+            // Write to file
             using (StreamWriter sw = File.CreateText(fileName))
             {
                 for (int i = 0; i <= 6; i++)
@@ -1061,14 +1011,12 @@ namespace LifeTracker
                 }
             }
 
-            //open file once written to
+            // Open file once written to
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
     }
 
-
     // Calendar Class
-
     public class Calendar
     {
         [XmlIgnore]
@@ -1076,7 +1024,7 @@ namespace LifeTracker
 
         public List<SerializeableKeyValue<long, Week>> weeksSerializeable = new List<SerializeableKeyValue<long, Week>>(); //DEBUG <--- make this match the rest of the code
 
-        public Week GetWeek(long key)
+        public Week GetWeek(long key) // Return week by entering epoch value corresponding to Monday of that week
         {
             if (!weeks.ContainsKey(key))
             {
@@ -1088,22 +1036,20 @@ namespace LifeTracker
             return weeks[key];
         }
 
-        public void AddWeek(Week week)
+        public void AddWeek(Week week) // Add week (given week data)
         {
             if (!weeks.ContainsKey(week.GetDate())) weeks.Add(week.GetDate(), week);
         }
-
-        public void RemoveWeek(long key)
+        public void RemoveWeek(long key) // Remove week from dictionary (given epoch date for Monday)
         {
             weeks.Remove(key);
         }
-
-        public void SetWeek(long key, Week week)
+        public void SetWeek(long key, Week week) // Update week value (given epoch date for Monday & week data)
         {
             weeks[key] = week;
         }
 
-        public void AddEvent(Event inputEvent, long date) //event, corresponding start-of-week in epoch format
+        public void AddEvent(Event inputEvent, long date) // Add event, corresponding start-of-week in epoch format
         {
             if (weeks.ContainsKey(date))
             {
@@ -1116,24 +1062,22 @@ namespace LifeTracker
                 weeks[date] = newWeek;
             }
         }
-
-        public void DeleteEvent(Event inputEvent)
+        public void DeleteEvent(Event inputEvent) // Delete a specific event from week
         {
             weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
         }
-
-        public void AddEvent(Event inputEvent)
+        public void AddEvent(Event inputEvent) // Add event (given just event)
         {
             weeks[inputEvent.GetDate_Time()].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
         }
 
-        private int EpochToWeekday(long inputDate)
+        private int EpochToWeekday(long inputDate) // Convert epoch long to integer (representing day of week)
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
         }
 
-        public void SaveXML(String filePath)
+        public void SaveXML(String filePath) // Save calendar class to XML file
         {
             if (!File.Exists(filePath))
             {
@@ -1152,7 +1096,7 @@ namespace LifeTracker
             saver.Serialize(file, this);
             file.Close();
         }
-        public Calendar LoadXML(String filePath)
+        public Calendar LoadXML(String filePath) // Load calendar class from XML file
         {
             if (!File.Exists(filePath))
             {
@@ -1181,37 +1125,41 @@ namespace LifeTracker
             }
         }
 
-        public Event GetSuggestion(Event inevent, Week week)
+        public Event GetSuggestion(Event inevent, Week week) // Suggest new event time / date
         {
             Dictionary<Event, long> scores = new Dictionary<Event, long>();
             Event bestEvent = inevent;
             long highestScore = 0;
+
+            // Iterate through all days in current week
             foreach (List<Event> day in week.GetWeek())
             {
                 Event tryevent = new Event();
                 tryevent.SetName(inevent.GetName());
 
+                // Convert to epoch value for next hour
                 DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inevent.GetDate_Time());
                 DateTime dateTime = dateTimeOffset.DateTime;
                 dateTime.AddHours(1.0);
                 TimeSpan t = dateTime - new DateTime(1970, 1, 1);
                 long curWeekEpoch = (long)t.TotalSeconds;
 
-                tryevent.SetDate_Time(curWeekEpoch);
 
+                // Set new event values
+                tryevent.SetDate_Time(curWeekEpoch);
                 tryevent.SetFlexibility(inevent.GetFlexibility());
                 tryevent.SetColor(inevent.GetColor());
                 tryevent.SetPriority(inevent.GetPriority());
                 tryevent.SetDescription(inevent.GetDescription());
                 tryevent.SetDuration(inevent.GetDuration());
-
                 tryevent.SetLocation(inevent.GetLocation());
 
+                // Calculate score (highest score is suggested timing)
                 int currDay = dateTime.Day;
                 int test = 0;
                 while (dateTime.Day == currDay)
                 {
-                    long newScore = calculateScore(tryevent, day);
+                    long newScore = CalculateScore(tryevent, day);
                     if (scores.ContainsKey(tryevent) == false)
                         scores.Add(tryevent, newScore);
 
@@ -1231,15 +1179,16 @@ namespace LifeTracker
             return bestEvent;
         }
 
-        private long calculateScore(Event inevent, List<Event> day)
+        // Calculate score for best new event time
+        private long CalculateScore(Event inevent, List<Event> day)
         {
-            //my fancy algorithm
             long score;
 
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inevent.GetDate_Time());
             DateTime dateTime = dateTimeOffset.DateTime;
             long dateScore = inevent.GetDate_Time() - Math.Abs(dateTime.Hour - 12);
 
+            // Algorithm factoring event data
             int priorityScore;
             if (inevent.GetPriority() == "LOW")
                 priorityScore = 3;
@@ -1251,7 +1200,6 @@ namespace LifeTracker
             int flexScore = inevent.GetFlexibility();
 
             int locationScore = 0;
-            //if(event.GetType() == typeof (location))
             foreach (Event anevent in day)
                 if (anevent.GetLocation().Equals(inevent.GetLocation()))
                     locationScore++;
@@ -1261,7 +1209,8 @@ namespace LifeTracker
             return score;
         }
     }
-    public class SerializeableKeyValue<T1, T2> //DEBUG <--- ADD TO CLASS DIAGRAMS!!!!!
+    // Generic key, value pair class that can be serialized
+    public class SerializeableKeyValue<T1, T2>
     {
         public T1 Key { get; set; }
         public T2 Value { get; set; }

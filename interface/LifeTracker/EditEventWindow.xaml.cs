@@ -14,16 +14,14 @@ using System.Windows.Shapes;
 
 namespace LifeTracker
 {
-    /// <summary>
-    /// Interaction logic for EditEventWindow.xaml
-    /// </summary>
     public partial class EditEventWindow : Window
     {
 
-        public bool deleteEventBool = false; //return to tell mainwindow whether to delete this event
+        public bool deleteEventBool = false; // Return to tell mainwindow whether to delete this event
         public EditEventWindow()
         {
             InitializeComponent();
+
             // Initialize Lists
             for (int i = 1; i <= 12; i++)
             {
@@ -89,12 +87,12 @@ namespace LifeTracker
             ColorList.Text = "LightBlue";
         }
 
-        private void Okay_Button_Click(object sender, RoutedEventArgs e)
+        private void OkayButtonClick(object sender, RoutedEventArgs e)
         {
             // Close create window.
             this.Close();
         }
-        private void Delete_Button_Click(object sender, RoutedEventArgs e)
+        private void DeleteButtonClick(object sender, RoutedEventArgs e)
         {
             // Close create window.
             deleteEventBool = true;

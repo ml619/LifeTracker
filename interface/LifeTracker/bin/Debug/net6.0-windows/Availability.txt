@@ -1,11 +1,12 @@
 Monday
 
-01:00 to 02:00,
-13:15 to 18:00,
+00:00 to 04:00,
+19:00 to 21:30,
 
 
 Tuesday
 
+14:00 to 16:00,
 
 
 Wednesday
@@ -18,10 +19,13 @@ Thursday
 
 Friday
 
+04:00 to 05:00,
+04:00 to 05:00,
 
 
 Saturday
 
+19:00 to 21:00,
 
 
 Sunday

@@ -15,9 +15,6 @@ using System.Windows.Threading;
 
 namespace LifeTracker
 {
-    /// <summary>
-    /// Interaction logic for ReminderWindow.xaml
-    /// </summary>
     public partial class ReminderWindow : Window
     {
         private protected System.Media.SoundPlayer player = new System.Media.SoundPlayer("Meeting Reminder.wav");
@@ -28,7 +25,7 @@ namespace LifeTracker
             // Play sound
             player.Play();
         }
-        private void Okay_Button_Click(object sender, RoutedEventArgs e)
+        private void OkayButtonClick(object sender, RoutedEventArgs e)
         {
             // Stop sound
             player.Stop();

@@ -208,7 +208,7 @@ namespace LifeTracker {
             case 11:
             
             #line 34 "..\..\..\EditEventWindow.xaml"
-            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Okay_Button_Click);
+            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.OkayButtonClick);
             
             #line default
             #line hidden
@@ -216,7 +216,7 @@ namespace LifeTracker {
             case 12:
             
             #line 35 "..\..\..\EditEventWindow.xaml"
-            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Okay_Button_Click);
+            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.OkayButtonClick);
             
             #line default
             #line hidden
@@ -233,7 +233,7 @@ namespace LifeTracker {
             case 16:
             
             #line 41 "..\..\..\EditEventWindow.xaml"
-            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Delete_Button_Click);
+            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.DeleteButtonClick);
             
             #line default
             #line hidden
@@ -241,7 +241,7 @@ namespace LifeTracker {
             case 17:
             
             #line 42 "..\..\..\EditEventWindow.xaml"
-            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Delete_Button_Click);
+            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.DeleteButtonClick);
             
             #line default
             #line hidden

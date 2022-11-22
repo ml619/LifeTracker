@@ -232,7 +232,7 @@ namespace LifeTracker {
             case 11:
             
             #line 34 "..\..\..\CreateEventWindow.xaml"
-            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Okay_Button_Click);
+            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.OkayButtonClick);
             
             #line default
             #line hidden
@@ -240,7 +240,7 @@ namespace LifeTracker {
             case 12:
             
             #line 35 "..\..\..\CreateEventWindow.xaml"
-            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Okay_Button_Click);
+            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.OkayButtonClick);
             
             #line default
             #line hidden

@@ -107,7 +107,7 @@ namespace LifeTracker {
             case 4:
             
             #line 14 "..\..\..\ReminderWindow.xaml"
-            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Okay_Button_Click);
+            ((System.Windows.Shapes.Rectangle)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.OkayButtonClick);
             
             #line default
             #line hidden
@@ -115,7 +115,7 @@ namespace LifeTracker {
             case 5:
             
             #line 15 "..\..\..\ReminderWindow.xaml"
-            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.Okay_Button_Click);
+            ((System.Windows.Controls.TextBlock)(target)).MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.OkayButtonClick);
             
             #line default
             #line hidden

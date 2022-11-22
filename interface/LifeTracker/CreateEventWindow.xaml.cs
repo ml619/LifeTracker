@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace LifeTracker
 {
-    /// <summary>
-    /// Interaction logic for Window1.xaml
-    /// </summary>
     public partial class CreateEventWindow : Window
     {
         public CreateEventWindow()
@@ -91,7 +88,7 @@ namespace LifeTracker
             StepInput.Text = "1";
         }
 
-        private void Okay_Button_Click(object sender, RoutedEventArgs e)
+        private void OkayButtonClick(object sender, RoutedEventArgs e)
         {
             // Close create window.
             this.Close();
