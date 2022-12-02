@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("bin/debug/net6.0-windows/favicon.ico")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("meeting%20reminder.mp3")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("meeting%20reminder.wav")]
 

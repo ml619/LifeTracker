@@ -168,6 +168,9 @@ namespace LifeTracker
                     AddEventToDisplay(dayInWeek[j]);
                 }
             }
+
+            //Update DatePicker
+            SelectDisplayWeek.SelectedDate = displayStartOfWeek;
         }
         // Change Date Displayed (Left Arrow)
         private void MoveWeekBackward(object sender, RoutedEventArgs e)
@@ -196,6 +199,9 @@ namespace LifeTracker
                     AddEventToDisplay(dayInWeek[j]);
                 }
             }
+
+            //Update DatePicker
+            SelectDisplayWeek.SelectedDate = displayStartOfWeek;
         }
         // Update Dates shown on display from input star- of-week day
         private void UpdateDisplayDates(DateTime inputDate)
