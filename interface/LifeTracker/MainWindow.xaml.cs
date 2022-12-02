@@ -16,6 +16,7 @@ using System.Threading;
 using System.IO;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using System.Runtime;
 
 
 namespace LifeTracker
@@ -168,6 +169,9 @@ namespace LifeTracker
                     AddEventToDisplay(dayInWeek[j]);
                 }
             }
+
+            //Update DatePicker
+            SelectDisplayWeek.SelectedDate = displayStartOfWeek;
         }
         // Change Date Displayed (Left Arrow)
         private void MoveWeekBackward(object sender, RoutedEventArgs e)
@@ -196,6 +200,9 @@ namespace LifeTracker
                     AddEventToDisplay(dayInWeek[j]);
                 }
             }
+
+            //Update DatePicker
+            SelectDisplayWeek.SelectedDate = displayStartOfWeek;
         }
         // Update Dates shown on display from input star- of-week day
         private void UpdateDisplayDates(DateTime inputDate)
@@ -349,6 +356,7 @@ namespace LifeTracker
 
             // Check if end time is before start time - do not create event if so
             if (tempEvent.GetDuration() < 0) return;
+            if (tempEvent.GetDate_Time() < 0) return;
 
             // Check if event within current week - if so, add to display
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
@@ -519,16 +527,24 @@ namespace LifeTracker
         // Convert User Input Date to Epoch Format (New Event Created)
         private long EpochTimeConversion(ref CreateEventWindow createWin)
         {
-            DateTime tempDate = UserInputToDateTime(ref createWin, 1);
+            bool nonexistantDate;
+            DateTime tempDate = UserInputToDateTime(ref createWin, 1, out nonexistantDate);
 
-            //convert datetime to epoch
+            // Return negative number if date doesn't exist
+            if(!nonexistantDate) return -1;
+
+            // Convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
             return (int)t.TotalSeconds;
         }
         // Convert User Input Date to Epoch Format (Edited Pre-existing Event)
         private long EpochTimeConversion(ref EditEventWindow editWin)
         {
-            DateTime tempDate = UserInputToDateTime(ref editWin, 1);
+            bool nonexistantDate;
+            DateTime tempDate = UserInputToDateTime(ref editWin, 1, out nonexistantDate);
+
+            // Return negative number if date doesn't exist
+            if (!nonexistantDate) return -1;
 
             //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
@@ -537,8 +553,14 @@ namespace LifeTracker
         // Find Duration of Event in terms of hours (New Event Created)
         private double HoursDifferenceConversion(ref CreateEventWindow createWin)
         {
-            DateTime tempDate1 = UserInputToDateTime(ref createWin, 1);
-            DateTime tempDate2 = UserInputToDateTime(ref createWin, 2);
+            bool nonexistantDate1;
+            bool nonexistantDate2;
+            DateTime tempDate1 = UserInputToDateTime(ref createWin, 1, out nonexistantDate1);
+            DateTime tempDate2 = UserInputToDateTime(ref createWin, 2, out nonexistantDate2);
+
+            // Return negative number if date doesn't exist
+            if (!nonexistantDate1 || !nonexistantDate2) return -1;
+
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
@@ -547,8 +569,13 @@ namespace LifeTracker
         // Find Duration of Event in terms of hours (Edited Pre-existing Event)
         private double HoursDifferenceConversion(ref EditEventWindow editWin) //SIMPLIFY 12to24 CONVERTER - DEBUG
         {
-            DateTime tempDate1 = UserInputToDateTime(ref editWin, 1);
-            DateTime tempDate2 = UserInputToDateTime(ref editWin, 2);
+            bool nonexistantDate1;
+            bool nonexistantDate2;
+            DateTime tempDate1 = UserInputToDateTime(ref editWin, 1, out nonexistantDate1);
+            DateTime tempDate2 = UserInputToDateTime(ref editWin, 2, out nonexistantDate2);
+
+            // Return negative number if date doesn't exist
+            if (!nonexistantDate1 || !nonexistantDate2) return -1;
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
@@ -556,9 +583,11 @@ namespace LifeTracker
         }
 
         // Convert user window input into DateTime class (New Event Created)
-        private DateTime UserInputToDateTime(ref CreateEventWindow createWin, int startOrEnd)
+        private DateTime UserInputToDateTime(ref CreateEventWindow createWin, int startOrEnd, out bool nonexistantDate)
         {
             {
+                nonexistantDate = false;
+
                 // Convert from 12 to 24 hour time (based on either start or end time)
                 String time12To24;
                 int temp;
@@ -600,13 +629,23 @@ namespace LifeTracker
                 String dateTimeString = createWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
 
                 // Return final date
-                return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                DateTime retDate; // Check if date actually exists
+                if (DateTime.TryParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out retDate))
+                {
+                    return retDate;
+                }
+
+                // If date doesn't exist return null
+                nonexistantDate = true;
+                return DateTime.Today;
             }
         }
 
         // Convert user window input into DateTime class (Existing Event Edited)
-        private DateTime UserInputToDateTime(ref EditEventWindow editWin, int startOrEnd)
+        private DateTime UserInputToDateTime(ref EditEventWindow editWin, int startOrEnd, out bool nonexistantDate)
         {
+            nonexistantDate = false;
+
             // Convert from 12 to 24 hour time (based on either start or end time)
             String time12To24;
             int temp;
@@ -648,7 +687,15 @@ namespace LifeTracker
             String dateTimeString = editWin.YearList.Text + "-" + MonthListString + "-" + DayListString + " " + time12To24 + ":00";
 
             // Return final date
-            return DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime retDate; // Check if date actually exists
+            if (DateTime.TryParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out retDate))
+            {
+                return retDate;
+            }
+
+            // If date doesn't exist return null
+            nonexistantDate = true;
+            return DateTime.Today;
         }
 
         private void AvailabilityButtonClick(object sender, RoutedEventArgs e)
