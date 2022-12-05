@@ -168,7 +168,7 @@ namespace LifeTracker
                 {
                     AddEventToDisplay(dayInWeek[j]);
                 }
-            }
+            } //IF WEEK WAS JUST CREATED, SOMETHING IS HAPPENING WHERE THE EVENT ADDED THERE IS DELETED IN THIS LOOP ??? DEBUG
 
             //Update DatePicker
             SelectDisplayWeek.SelectedDate = displayStartOfWeek;
@@ -393,16 +393,19 @@ namespace LifeTracker
             if (tempEvent.GetType() == typeof(Recurring))
             {
                 // Increment by step until fulfilled all instances (minus current one)
-                for(int i = 0; i < ((Recurring)tempEvent).GetNumInstances() - 1; i++)
+                for(int i = 0; i < ((Recurring)tempEvent).GetNumInstances(); i++)
                 {
                     //Look for correct week to add event to, do NOT add to current display
                     DateTime dateTime = (dateTimeOffset.DateTime).AddDays(7 * ((Recurring)tempEvent).GetStep());
+                    long epoch = (long)(dateTime - new DateTime(1970, 1, 1)).TotalSeconds;
+
+                    //CONVERT DATETIME TO EPOCH, USE INSTEAD OF tempEvent.GetDate_Time() //ERIN
 
                     int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
 
-                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    int tempDateVal = (int)(epoch - (epoch % 86400)); //get in terms of just day (no hours, auto start at 12)
                     dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
-                    DateTime adjustedDate = dateTimeOffset.DateTime;
+                    DateTime adjustedDate = FindNearestMonday(dateTimeOffset.DateTime);
 
                     long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds; //DEBUG <----- monday of the first event, not changing for some reason
                     calendar.AddEvent(tempEvent, mondayEpoch);
@@ -486,16 +489,45 @@ namespace LifeTracker
 
             editWin.ShowDialog();
 
-            // Create new event (unless should be deleted OR duration is negative)
+            // Create new event (unless should be deleted OR duration is negative) ERIN HERE
             if (editWin.deleteEventBool == false)
             {
-                // Add event into week object
-                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(EditEvent(ref editWin).GetDate_Time());
-                dateTime = dateTimeOffset.DateTime;
-                currentWeek.AddEvent(EditEvent(ref editWin), (int)dateTime.DayOfWeek);
+                // Create event
+                Event tempEvent = EditEvent(ref editWin);
 
-                // Add event to display
-                AddEventToDisplay(EditEvent(ref editWin));
+                // Check if end time is before start time - do not create event if so
+                if (tempEvent.GetDuration() < 0) return;
+                if (tempEvent.GetDate_Time() < 0) return;
+
+                // Check if event within current week - if so, add to display
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                DateTime inputDate = dateTimeOffset.DateTime;
+                DateTime startDate = displayStartOfWeek;
+                DateTime endDate = startDate.AddDays(7);
+                if (startDate <= inputDate && inputDate < endDate)
+                {
+                    // Add event into week object
+                    dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                    dateTime = dateTimeOffset.DateTime;
+                    currentWeek.AddEvent(tempEvent, (int)dateTime.DayOfWeek);
+
+                    // Add event to display
+                    AddEventToDisplay(tempEvent);
+                }
+                else
+                {
+                    // Look for correct week to add event to, do NOT add to current display
+                    dateTime = dateTimeOffset.DateTime;
+
+                    int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
+
+                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
+                    DateTime adjustedDate = dateTimeOffset.DateTime;
+
+                    long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds;
+                    calendar.AddEvent(tempEvent, mondayEpoch);
+                }
             }
 
             // Delete old event
@@ -531,7 +563,7 @@ namespace LifeTracker
             DateTime tempDate = UserInputToDateTime(ref createWin, 1, out nonexistantDate);
 
             // Return negative number if date doesn't exist
-            if(!nonexistantDate) return -1;
+            if(nonexistantDate) return -1;
 
             // Convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
@@ -544,7 +576,7 @@ namespace LifeTracker
             DateTime tempDate = UserInputToDateTime(ref editWin, 1, out nonexistantDate);
 
             // Return negative number if date doesn't exist
-            if (!nonexistantDate) return -1;
+            if (nonexistantDate) return -1;
 
             //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
@@ -559,7 +591,7 @@ namespace LifeTracker
             DateTime tempDate2 = UserInputToDateTime(ref createWin, 2, out nonexistantDate2);
 
             // Return negative number if date doesn't exist
-            if (!nonexistantDate1 || !nonexistantDate2) return -1;
+            if (nonexistantDate1 || nonexistantDate2) return -1;
 
 
             //find difference between end and start, convert from seconds to hours
@@ -575,7 +607,7 @@ namespace LifeTracker
             DateTime tempDate2 = UserInputToDateTime(ref editWin, 2, out nonexistantDate2);
 
             // Return negative number if date doesn't exist
-            if (!nonexistantDate1 || !nonexistantDate2) return -1;
+            if (nonexistantDate1 || nonexistantDate2) return -1;
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
@@ -761,7 +793,6 @@ namespace LifeTracker
             MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
         }
 
-
         private void AcceptButtonClick(object sender, RoutedEventArgs e)
         {
             // Mark that an accept has been chosen
@@ -939,7 +970,7 @@ namespace LifeTracker
             location = Location;
         }
     }
-    class Recurring : Event
+    public class Recurring : Event
     {
         public int numInstances; // How many events there are
         public long GetNumInstances()
@@ -1057,7 +1088,6 @@ namespace LifeTracker
                     }
                 }
             }
-
             // Open file once written to
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
