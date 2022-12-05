@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "hCw/7YXcXIuJ3gW2Fj3K0aeAlwEmixlq78TYAHncNa6nHyNHVqs1t5dsdcSYCPpAr3mbrwtxrUwH6444B/kfsQ==",
+  "dgSpecHash": "4Tf9WZaqVvB/Ftqj3pfOzLzrEclcVpLGK39ye8vRhj8rg+btGiN8mf/z6i7wR+dpUrrOSk5sDpPixqqHo1eyHg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\lenysm\\Desktop\\tmp\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\lenysm\\.nuget\\packages\\sonaranalyzer.csharp\\8.50.0.58025\\sonaranalyzer.csharp.8.50.0.58025.nupkg.sha512"
+  ],
   "logs": []
 }
