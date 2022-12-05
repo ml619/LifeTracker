@@ -17,7 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Runtime;
-
+using Newtonsoft.Json
 
 namespace LifeTracker
 {
@@ -51,7 +51,7 @@ namespace LifeTracker
             SelectDisplayWeek.SelectedDate = DateTime.Today;
 
             // Load JSON data
-            calendar.LoadXML(saveFileName);
+            calendar.Load(saveFileName);
 
             // Set current week to corresponding data in calendar
             TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
@@ -88,7 +88,7 @@ namespace LifeTracker
         // Close Window
         private void CloseButtonClick(object sender, RoutedEventArgs e)
         {
-            calendar.SaveXML(saveFileName);
+            calendar.Save(saveFileName);
             Close();
         }
         // Minimize Window
@@ -1154,52 +1154,57 @@ namespace LifeTracker
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
         }
 
-        public void SaveXML(String filePath) // Save calendar class to XML file
+        public void Save(String filePath) // Save calendar class to XML file
         {
             if (!File.Exists(filePath))
             {
                 File.Create(filePath);
             }
 
+            string serializedCalander = JsonConvert.SerializeObject(this);
+            File.WriteAllText(filePath, serializedCalander);
             //convert dictionary to serializable list
-            weeksSerializeable = new List<SerializeableKeyValue<long, Week>>();
-            foreach (KeyValuePair<long, Week> p in weeks)
-            {
-                weeksSerializeable.Add(new SerializeableKeyValue<long, Week>(p.Key, p.Value));
-            }
+            // weeksSerializeable = new List<SerializeableKeyValue<long, Week>>();
+            // foreach (KeyValuePair<long, Week> p in weeks)
+            // {
+            //     weeksSerializeable.Add(new SerializeableKeyValue<long, Week>(p.Key, p.Value));
+            // }
 
-            System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
-            System.IO.FileStream file = System.IO.File.Create(filePath);
-            saver.Serialize(file, this);
-            file.Close();
+            // System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
+            // System.IO.FileStream file = System.IO.File.Create(filePath);
+            // saver.Serialize(file, this);
+            // file.Close();
         }
-        public Calendar LoadXML(String filePath) // Load calendar class from XML file
+        public Calendar Load(String filePath) // Load calendar class from XML file
         {
             if (!File.Exists(filePath))
             {
                 File.Create(filePath);
             }
 
-            if (new FileInfo(filePath).Length == 0) return new Calendar();
-            else
-            {
-                System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
-                System.IO.StreamReader file = new System.IO.StreamReader(filePath);
-                var calendar = (Calendar)loader.Deserialize(file);
-                file.Close();
+            string serializedCalander = File.ReadAllText(filePath);
+            Calendar deserializedCalander = JsonConvert.DeserializeObject<Calendar>(serializedCalander);
+            return deserializedCalanderl
+            // if (new FileInfo(filePath).Length == 0) return new Calendar();
+            // else
+            // {
+            //     System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
+            //     System.IO.StreamReader file = new System.IO.StreamReader(filePath);
+            //     var calendar = (Calendar)loader.Deserialize(file);
+            //     file.Close();
 
-                weeksSerializeable = calendar.weeksSerializeable;
+            //     weeksSerializeable = calendar.weeksSerializeable;
 
-                //convert serializable list to dictionary
-                weeks = new Dictionary<long, Week>();
-                //weeks = weeksSerializeable.ToDictionary(x => x.Key, x => x.Value); //DEBUG
-                foreach (SerializeableKeyValue<long, Week> p in weeksSerializeable)
-                {
-                    if (!weeks.ContainsKey(p.Key)) weeks.Add(p.Key, p.Value);
-                }
+            //     //convert serializable list to dictionary
+            //     weeks = new Dictionary<long, Week>();
+            //     //weeks = weeksSerializeable.ToDictionary(x => x.Key, x => x.Value); //DEBUG
+            //     foreach (SerializeableKeyValue<long, Week> p in weeksSerializeable)
+            //     {
+            //         if (!weeks.ContainsKey(p.Key)) weeks.Add(p.Key, p.Value);
+            //     }
 
-                return calendar;
-            }
+            //     return calendar;
+            // }
         }
 
         public Event GetSuggestion(Event inevent, Week week) // Suggest new event time / date
