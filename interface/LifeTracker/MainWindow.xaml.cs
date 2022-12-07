@@ -17,7 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Runtime;
-
+using Newtonsoft.Json;
 
 namespace LifeTracker
 {
@@ -32,7 +32,7 @@ namespace LifeTracker
         public Week currentWeek = new Week();
         public Calendar calendar = new Calendar();
 
-        string saveFileName = "Storage.xml";
+        string saveFileName = "Storage.json";
 
         bool muteCheck = false;
 
@@ -51,7 +51,7 @@ namespace LifeTracker
             SelectDisplayWeek.SelectedDate = DateTime.Today;
 
             // Load JSON data
-            calendar.LoadXML(saveFileName);
+            calendar = calendar.Load(saveFileName);
 
             // Set current week to corresponding data in calendar
             TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
@@ -88,7 +88,7 @@ namespace LifeTracker
         // Close Window
         private void CloseButtonClick(object sender, RoutedEventArgs e)
         {
-            calendar.SaveXML(saveFileName);
+            calendar.Save(saveFileName);
             Close();
         }
         // Minimize Window
@@ -168,7 +168,7 @@ namespace LifeTracker
                 {
                     AddEventToDisplay(dayInWeek[j]);
                 }
-            }
+            } //IF WEEK WAS JUST CREATED, SOMETHING IS HAPPENING WHERE THE EVENT ADDED THERE IS DELETED IN THIS LOOP ??? DEBUG
 
             //Update DatePicker
             SelectDisplayWeek.SelectedDate = displayStartOfWeek;
@@ -393,16 +393,19 @@ namespace LifeTracker
             if (tempEvent.GetType() == typeof(Recurring))
             {
                 // Increment by step until fulfilled all instances (minus current one)
-                for(int i = 0; i < ((Recurring)tempEvent).GetNumInstances() - 1; i++)
+                for (int i = 0; i < ((Recurring)tempEvent).GetNumInstances(); i++)
                 {
                     //Look for correct week to add event to, do NOT add to current display
                     DateTime dateTime = (dateTimeOffset.DateTime).AddDays(7 * ((Recurring)tempEvent).GetStep());
+                    long epoch = (long)(dateTime - new DateTime(1970, 1, 1)).TotalSeconds;
+
+                    //CONVERT DATETIME TO EPOCH, USE INSTEAD OF tempEvent.GetDate_Time() //ERIN
 
                     int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
 
-                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    int tempDateVal = (int)(epoch - (epoch % 86400)); //get in terms of just day (no hours, auto start at 12)
                     dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
-                    DateTime adjustedDate = dateTimeOffset.DateTime;
+                    DateTime adjustedDate = FindNearestMonday(dateTimeOffset.DateTime);
 
                     long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds; //DEBUG <----- monday of the first event, not changing for some reason
                     calendar.AddEvent(tempEvent, mondayEpoch);
@@ -486,16 +489,45 @@ namespace LifeTracker
 
             editWin.ShowDialog();
 
-            // Create new event (unless should be deleted OR duration is negative)
+            // Create new event (unless should be deleted OR duration is negative) ERIN HERE
             if (editWin.deleteEventBool == false)
             {
-                // Add event into week object
-                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(EditEvent(ref editWin).GetDate_Time());
-                dateTime = dateTimeOffset.DateTime;
-                currentWeek.AddEvent(EditEvent(ref editWin), (int)dateTime.DayOfWeek);
+                // Create event
+                Event tempEvent = EditEvent(ref editWin);
 
-                // Add event to display
-                AddEventToDisplay(EditEvent(ref editWin));
+                // Check if end time is before start time - do not create event if so
+                if (tempEvent.GetDuration() < 0) return;
+                if (tempEvent.GetDate_Time() < 0) return;
+
+                // Check if event within current week - if so, add to display
+                dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                DateTime inputDate = dateTimeOffset.DateTime;
+                DateTime startDate = displayStartOfWeek;
+                DateTime endDate = startDate.AddDays(7);
+                if (startDate <= inputDate && inputDate < endDate)
+                {
+                    // Add event into week object
+                    dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempEvent.GetDate_Time());
+                    dateTime = dateTimeOffset.DateTime;
+                    currentWeek.AddEvent(tempEvent, (int)dateTime.DayOfWeek);
+
+                    // Add event to display
+                    AddEventToDisplay(tempEvent);
+                }
+                else
+                {
+                    // Look for correct week to add event to, do NOT add to current display
+                    dateTime = dateTimeOffset.DateTime;
+
+                    int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
+
+                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
+                    DateTime adjustedDate = dateTimeOffset.DateTime;
+
+                    long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds;
+                    calendar.AddEvent(tempEvent, mondayEpoch);
+                }
             }
 
             // Delete old event
@@ -531,7 +563,7 @@ namespace LifeTracker
             DateTime tempDate = UserInputToDateTime(ref createWin, 1, out nonexistantDate);
 
             // Return negative number if date doesn't exist
-            if(!nonexistantDate) return -1;
+            if (nonexistantDate) return -1;
 
             // Convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
@@ -544,7 +576,7 @@ namespace LifeTracker
             DateTime tempDate = UserInputToDateTime(ref editWin, 1, out nonexistantDate);
 
             // Return negative number if date doesn't exist
-            if (!nonexistantDate) return -1;
+            if (nonexistantDate) return -1;
 
             //convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
@@ -559,7 +591,7 @@ namespace LifeTracker
             DateTime tempDate2 = UserInputToDateTime(ref createWin, 2, out nonexistantDate2);
 
             // Return negative number if date doesn't exist
-            if (!nonexistantDate1 || !nonexistantDate2) return -1;
+            if (nonexistantDate1 || nonexistantDate2) return -1;
 
 
             //find difference between end and start, convert from seconds to hours
@@ -575,7 +607,7 @@ namespace LifeTracker
             DateTime tempDate2 = UserInputToDateTime(ref editWin, 2, out nonexistantDate2);
 
             // Return negative number if date doesn't exist
-            if (!nonexistantDate1 || !nonexistantDate2) return -1;
+            if (nonexistantDate1 || nonexistantDate2) return -1;
 
             //find difference between end and start, convert from seconds to hours
             TimeSpan t = tempDate2 - tempDate1;
@@ -761,7 +793,6 @@ namespace LifeTracker
             MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
         }
 
-
         private void AcceptButtonClick(object sender, RoutedEventArgs e)
         {
             // Mark that an accept has been chosen
@@ -939,7 +970,7 @@ namespace LifeTracker
             location = Location;
         }
     }
-    class Recurring : Event
+    public class Recurring : Event
     {
         public int numInstances; // How many events there are
         public long GetNumInstances()
@@ -1057,7 +1088,6 @@ namespace LifeTracker
                     }
                 }
             }
-
             // Open file once written to
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
@@ -1066,10 +1096,8 @@ namespace LifeTracker
     // Calendar Class
     public class Calendar
     {
-        [XmlIgnore]
+        [JsonProperty]
         private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
-
-        public List<SerializeableKeyValue<long, Week>> weeksSerializeable = new List<SerializeableKeyValue<long, Week>>(); //DEBUG <--- make this match the rest of the code
 
         public Week GetWeek(long key) // Return week by entering epoch value corresponding to Monday of that week
         {
@@ -1124,52 +1152,32 @@ namespace LifeTracker
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
         }
 
-        public void SaveXML(String filePath) // Save calendar class to XML file
+        public void Save(String filePath) // Save calendar class to XML file
         {
+            // Check if the file exists, create new one if not
             if (!File.Exists(filePath))
             {
                 File.Create(filePath);
             }
 
-            //convert dictionary to serializable list
-            weeksSerializeable = new List<SerializeableKeyValue<long, Week>>();
-            foreach (KeyValuePair<long, Week> p in weeks)
-            {
-                weeksSerializeable.Add(new SerializeableKeyValue<long, Week>(p.Key, p.Value));
-            }
 
-            System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
-            System.IO.FileStream file = System.IO.File.Create(filePath);
-            saver.Serialize(file, this);
-            file.Close();
+            // Serialize data
+            string serializedCalander = JsonConvert.SerializeObject(this);
+            File.WriteAllText(filePath, serializedCalander);
         }
-        public Calendar LoadXML(String filePath) // Load calendar class from XML file
+        public Calendar Load(String filePath) // Load calendar class from XML file
         {
+            // Check if the file exists, create new one if not
             if (!File.Exists(filePath))
             {
                 File.Create(filePath);
             }
 
-            if (new FileInfo(filePath).Length == 0) return new Calendar();
-            else
-            {
-                System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
-                System.IO.StreamReader file = new System.IO.StreamReader(filePath);
-                var calendar = (Calendar)loader.Deserialize(file);
-                file.Close();
+            // Deserialize data
+            string serializedCalander = File.ReadAllText(filePath);
+            Calendar deserializedCalander = JsonConvert.DeserializeObject<Calendar>(serializedCalander);
 
-                weeksSerializeable = calendar.weeksSerializeable;
-
-                //convert serializable list to dictionary
-                weeks = new Dictionary<long, Week>();
-                //weeks = weeksSerializeable.ToDictionary(x => x.Key, x => x.Value); //DEBUG
-                foreach (SerializeableKeyValue<long, Week> p in weeksSerializeable)
-                {
-                    if (!weeks.ContainsKey(p.Key)) weeks.Add(p.Key, p.Value);
-                }
-
-                return calendar;
-            }
+            return deserializedCalander;
         }
 
         public Event GetSuggestion(Event inevent, Week week) // Suggest new event time / date
@@ -1254,18 +1262,6 @@ namespace LifeTracker
             score = dateScore + priorityScore + flexScore + locationScore;
 
             return score;
-        }
-    }
-    // Generic key, value pair class that can be serialized
-    public class SerializeableKeyValue<T1, T2>
-    {
-        public T1 Key { get; set; }
-        public T2 Value { get; set; }
-        public SerializeableKeyValue() { }
-        public SerializeableKeyValue(T1 t1, T2 t2)
-        {
-            Key = t1;
-            Value = t2;
         }
     }
 }

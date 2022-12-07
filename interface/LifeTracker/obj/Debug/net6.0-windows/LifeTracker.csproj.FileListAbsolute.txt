@@ -81,3 +81,5 @@ C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\De
 C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.pdb
 C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.genruntimeconfig.cache
 C:\Users\ittya\Documents\JuniorFall\SDD\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\ref\LifeTracker.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Debug\net6.0-windows\LifeTracker.csproj.CopyComplete
