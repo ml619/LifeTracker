@@ -17,7 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Runtime;
-using Newtonsoft.Json
+using Newtonsoft.Json;
 
 namespace LifeTracker
 {
@@ -32,7 +32,7 @@ namespace LifeTracker
         public Week currentWeek = new Week();
         public Calendar calendar = new Calendar();
 
-        string saveFileName = "Storage.xml";
+        string saveFileName = "Storage.json";
 
         bool muteCheck = false;
 
@@ -51,7 +51,7 @@ namespace LifeTracker
             SelectDisplayWeek.SelectedDate = DateTime.Today;
 
             // Load JSON data
-            calendar.Load(saveFileName);
+            calendar = calendar.Load(saveFileName);
 
             // Set current week to corresponding data in calendar
             TimeSpan t = FindNearestMonday(DateTime.Today) - new DateTime(1970, 1, 1);
@@ -393,7 +393,7 @@ namespace LifeTracker
             if (tempEvent.GetType() == typeof(Recurring))
             {
                 // Increment by step until fulfilled all instances (minus current one)
-                for(int i = 0; i < ((Recurring)tempEvent).GetNumInstances(); i++)
+                for (int i = 0; i < ((Recurring)tempEvent).GetNumInstances(); i++)
                 {
                     //Look for correct week to add event to, do NOT add to current display
                     DateTime dateTime = (dateTimeOffset.DateTime).AddDays(7 * ((Recurring)tempEvent).GetStep());
@@ -563,7 +563,7 @@ namespace LifeTracker
             DateTime tempDate = UserInputToDateTime(ref createWin, 1, out nonexistantDate);
 
             // Return negative number if date doesn't exist
-            if(nonexistantDate) return -1;
+            if (nonexistantDate) return -1;
 
             // Convert datetime to epoch
             TimeSpan t = tempDate - new DateTime(1970, 1, 1);
@@ -1096,10 +1096,8 @@ namespace LifeTracker
     // Calendar Class
     public class Calendar
     {
-        [XmlIgnore]
+        [JsonProperty]
         private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
-
-        public List<SerializeableKeyValue<long, Week>> weeksSerializeable = new List<SerializeableKeyValue<long, Week>>(); //DEBUG <--- make this match the rest of the code
 
         public Week GetWeek(long key) // Return week by entering epoch value corresponding to Monday of that week
         {
@@ -1156,55 +1154,30 @@ namespace LifeTracker
 
         public void Save(String filePath) // Save calendar class to XML file
         {
+            // Check if the file exists, create new one if not
             if (!File.Exists(filePath))
             {
                 File.Create(filePath);
             }
 
+
+            // Serialize data
             string serializedCalander = JsonConvert.SerializeObject(this);
             File.WriteAllText(filePath, serializedCalander);
-            //convert dictionary to serializable list
-            // weeksSerializeable = new List<SerializeableKeyValue<long, Week>>();
-            // foreach (KeyValuePair<long, Week> p in weeks)
-            // {
-            //     weeksSerializeable.Add(new SerializeableKeyValue<long, Week>(p.Key, p.Value));
-            // }
-
-            // System.Xml.Serialization.XmlSerializer saver = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
-            // System.IO.FileStream file = System.IO.File.Create(filePath);
-            // saver.Serialize(file, this);
-            // file.Close();
         }
         public Calendar Load(String filePath) // Load calendar class from XML file
         {
+            // Check if the file exists, create new one if not
             if (!File.Exists(filePath))
             {
                 File.Create(filePath);
             }
 
+            // Deserialize data
             string serializedCalander = File.ReadAllText(filePath);
             Calendar deserializedCalander = JsonConvert.DeserializeObject<Calendar>(serializedCalander);
-            return deserializedCalanderl
-            // if (new FileInfo(filePath).Length == 0) return new Calendar();
-            // else
-            // {
-            //     System.Xml.Serialization.XmlSerializer loader = new System.Xml.Serialization.XmlSerializer(typeof(Calendar));
-            //     System.IO.StreamReader file = new System.IO.StreamReader(filePath);
-            //     var calendar = (Calendar)loader.Deserialize(file);
-            //     file.Close();
 
-            //     weeksSerializeable = calendar.weeksSerializeable;
-
-            //     //convert serializable list to dictionary
-            //     weeks = new Dictionary<long, Week>();
-            //     //weeks = weeksSerializeable.ToDictionary(x => x.Key, x => x.Value); //DEBUG
-            //     foreach (SerializeableKeyValue<long, Week> p in weeksSerializeable)
-            //     {
-            //         if (!weeks.ContainsKey(p.Key)) weeks.Add(p.Key, p.Value);
-            //     }
-
-            //     return calendar;
-            // }
+            return deserializedCalander;
         }
 
         public Event GetSuggestion(Event inevent, Week week) // Suggest new event time / date
@@ -1289,18 +1262,6 @@ namespace LifeTracker
             score = dateScore + priorityScore + flexScore + locationScore;
 
             return score;
-        }
-    }
-    // Generic key, value pair class that can be serialized
-    public class SerializeableKeyValue<T1, T2>
-    {
-        public T1 Key { get; set; }
-        public T2 Value { get; set; }
-        public SerializeableKeyValue() { }
-        public SerializeableKeyValue(T1 t1, T2 t2)
-        {
-            Key = t1;
-            Value = t2;
         }
     }
 }

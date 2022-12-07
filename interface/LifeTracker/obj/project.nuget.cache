@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "aLqqxdiHQTaqxisofELnW9W2Ysfv5H9Jg7L7CUKm3JtJW0y+9o70b9GoeFmGisJn+EgfZZ91CGE41/U8s6JoWQ==",
+  "dgSpecHash": "8Mqag5XwRoPoomndHIL6kwyUNyMzLkp48kQmw+jo+trQoNeoxSbiAvTqH9w0ru5U6JVCRONQcc1dWEVpez8Nuw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\lenysm\\Desktop\\tmp\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
+  "projectFilePath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\lenysm\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512",
-    "C:\\Users\\lenysm\\.nuget\\packages\\sonaranalyzer.csharp\\8.50.0.58025\\sonaranalyzer.csharp.8.50.0.58025.nupkg.sha512"
+    "C:\\Users\\cohene4\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512",
+    "C:\\Users\\cohene4\\.nuget\\packages\\sonaranalyzer.csharp\\8.50.0.58025\\sonaranalyzer.csharp.8.50.0.58025.nupkg.sha512"
   ],
   "logs": []
 }
