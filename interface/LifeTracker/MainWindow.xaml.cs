@@ -1,22 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Threading;
 using System.IO;
 using System.Diagnostics;
-using System.Xml.Serialization;
-using System.Runtime;
 using Newtonsoft.Json;
 
 namespace LifeTracker
@@ -881,10 +872,28 @@ namespace LifeTracker
     //CLASSES
 
     // Event Classes
-    public class Event // (items are public for sake of serialization)
+    public class Event
     {
+        // Private member variables
+        [JsonProperty("name")]
+        private string name; // Name of event
+        [JsonProperty("date_time")]
+        private long date_time; // Date and time in epoch
+        [JsonProperty("flexibility")]
+        private int flexibility; // How easily event can be moved
+        [JsonProperty("color")]
+        private string color; // Color of event on display
+        [JsonProperty("duration")]
+        private double duration; // In terms of number of hours (NOT epoch)
+        [JsonProperty("priority")]
+        private string priority; // How soon the event should be completed
+        [JsonProperty("description")]
+        private string description; // Short description of activity 
+        [JsonProperty("location")]
+        private string location; // Where the event takes place
 
-        public string name; // Name of event
+
+        // Name (Title) get and set
         public string GetName()
         {
             return name;
@@ -894,8 +903,7 @@ namespace LifeTracker
             name = Name;
         }
 
-
-        public long date_time; // Date and time in epoch
+        // Epoch date and time get and set
         public long GetDate_Time()
         {
             return date_time;
@@ -905,8 +913,7 @@ namespace LifeTracker
             date_time = Date_Time;
         }
 
-
-        public int flexibility; // How easilt event can be moved
+        // Flexibility score get and set
         public int GetFlexibility()
         {
             return flexibility;
@@ -916,8 +923,7 @@ namespace LifeTracker
             flexibility = Flexibility;
         }
 
-
-        public string color; // Color of event on display
+        // Display color get and set
         public string GetColor()
         {
             return color;
@@ -927,8 +933,7 @@ namespace LifeTracker
             color = Color;
         }
 
-
-        public double duration; // In terms of number of hours (NOT epoch)
+        // Duration get and set
         public double GetDuration()
         {
             return duration;
@@ -938,8 +943,7 @@ namespace LifeTracker
             duration = Duration;
         }
 
-
-        public string priority; // How soon the event should be completed
+        // Priority score get and set
         public string GetPriority()
         {
             return priority;
@@ -949,8 +953,7 @@ namespace LifeTracker
             priority = Priority;
         }
 
-
-        public string description; // Short description of activity 
+        // Description of event get and set
         public string GetDescription()
         {
             return description;
@@ -960,7 +963,7 @@ namespace LifeTracker
             description = Description;
         }
 
-        public string location; // Where the event takes place
+        // Location of event get and set
         public string GetLocation()
         {
             return location;
@@ -996,17 +999,28 @@ namespace LifeTracker
     // Week Class
     public class Week
     {
-        public List<Event> mon; // Lists of events (public for sake of serialization)
-        public List<Event> tue;
-        public List<Event> wed;
-        public List<Event> thu;
-        public List<Event> fri;
-        public List<Event> sat;
-        public List<Event> sun;
+        // Private member variables
+        [JsonProperty("mon")]
+        private List<Event> mon; // Lists of events (public for sake of serialization)
+        [JsonProperty("tue")]
+        private List<Event> tue;
+        [JsonProperty("wed")]
+        private List<Event> wed;
+        [JsonProperty("thu")]
+        private List<Event> thu;
+        [JsonProperty("fri")]
+        private List<Event> fri;
+        [JsonProperty("sat")]
+        private List<Event> sat;
+        [JsonProperty("sun")]
+        private List<Event> sun;
 
-        public List<List<Event>> a_week;
-        public long date;
+        [JsonProperty("a_week")]
+        private List<List<Event>> a_week;
+        [JsonProperty("date")]
+        private long date;
 
+        // Functions
         public Week()
         {
             mon = new List<Event>(); // Lists of events
@@ -1096,9 +1110,11 @@ namespace LifeTracker
     // Calendar Class
     public class Calendar
     {
-        [JsonProperty]
+        // Private member variable
+        [JsonProperty("weeks")]
         private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
 
+        // Functions
         public Week GetWeek(long key) // Return week by entering epoch value corresponding to Monday of that week
         {
             if (!weeks.ContainsKey(key))
