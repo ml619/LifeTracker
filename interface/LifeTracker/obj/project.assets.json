@@ -5,10 +5,14 @@
       "Newtonsoft.Json/13.0.2": {
         "type": "package",
         "compile": {
-          "lib/net6.0/Newtonsoft.Json.dll": {}
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "lib/net6.0/Newtonsoft.Json.dll": {}
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
         }
       },
       "SonarAnalyzer.CSharp/8.50.0.58025": {
@@ -75,23 +79,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\cohene4\\.nuget\\packages\\": {}
+    "C:\\Users\\ittya\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
+      "projectUniqueName": "C:\\Users\\ittya\\Documents\\JuniorFall\\SDD\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
       "projectName": "LifeTracker",
-      "projectPath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
-      "packagesPath": "C:\\Users\\cohene4\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\cohene4\\Documents\\LifeTracker\\interface\\LifeTracker\\obj\\",
+      "projectPath": "C:\\Users\\ittya\\Documents\\JuniorFall\\SDD\\LifeTracker\\interface\\LifeTracker\\LifeTracker.csproj",
+      "packagesPath": "C:\\Users\\ittya\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ittya\\Documents\\JuniorFall\\SDD\\LifeTracker\\interface\\LifeTracker\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\cohene4\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ittya\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0-windows7.0"
+        "net6.0-windows"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -130,7 +134,8 @@
           "net47",
           "net471",
           "net472",
-          "net48"
+          "net48",
+          "net481"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -142,7 +147,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
       }
     }
   }

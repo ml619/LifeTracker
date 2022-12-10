@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Linq;
 using System.IO;
 using System.Diagnostics;
 using Newtonsoft.Json;
@@ -726,6 +727,7 @@ namespace LifeTracker
             currentWeek.ExportAvailability();
         }
 
+        int resCount = 0;
         private async void RescheduleButtonClick(object sender, RoutedEventArgs e)
         {
             if (suggestMode)
@@ -754,7 +756,8 @@ namespace LifeTracker
             await tcs1.Task;
 
             // Add suggested event to display (NOT to week object yet)
-            suggestedEvent = calendar.GetSuggestion(originalEvent, currentWeek);
+            List<KeyValuePair<Event,long>> suggestedEvents = calendar.GetSuggestion(originalEvent, currentWeek).OrderBy(score => score.Value).ToList();
+            suggestedEvent = suggestedEvents[resCount].Key;
 
             // Display suggestion
             AddEventToDisplay(suggestedEvent);
@@ -782,6 +785,7 @@ namespace LifeTracker
             suggestedEvent = null;
             originalEvent = null;
             MainBackground.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E8E5FFE4");
+            resCount++;
         }
 
         private void AcceptButtonClick(object sender, RoutedEventArgs e)
@@ -1196,7 +1200,7 @@ namespace LifeTracker
             return deserializedCalander;
         }
 
-        public Event GetSuggestion(Event inevent, Week week) // Suggest new event time / date
+        public Dictionary<Event, long> GetSuggestion(Event inevent, Week week) // Suggest new event time / date //used to return Event
         {
             Dictionary<Event, long> scores = new Dictionary<Event, long>();
             Event bestEvent = inevent;
@@ -1227,7 +1231,6 @@ namespace LifeTracker
 
                 // Calculate score (highest score is suggested timing)
                 int currDay = dateTime.Day;
-                int test = 0;
                 while (dateTime.Day == currDay)
                 {
                     long newScore = CalculateScore(tryevent, day);
@@ -1240,14 +1243,14 @@ namespace LifeTracker
                         bestEvent = tryevent;
                     }
 
-                    test++;
                     dateTime = dateTime.AddHours(1.0);
                     t = dateTime - new DateTime(1970, 1, 1);
                     curWeekEpoch = (long)t.TotalSeconds;
                     tryevent.SetDate_Time(curWeekEpoch);
                 }
             }
-            return bestEvent;
+            return scores;
+            //return bestEvent;
         }
 
         // Calculate score for best new event time
