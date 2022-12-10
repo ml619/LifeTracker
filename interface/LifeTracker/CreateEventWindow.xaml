@@ -31,16 +31,11 @@
         <ComboBox x:Name="MonthList" HorizontalAlignment="Left" Margin="84,63,0,0" VerticalAlignment="Top" Width="76" Height="22"/>
         <ComboBox x:Name="DayList" HorizontalAlignment="Left" Margin="165,61,0,0" VerticalAlignment="Top" Width="52" Height="24"/>
         <ComboBox x:Name="YearList" HorizontalAlignment="Left" Margin="222,62,0,0" VerticalAlignment="Top" Width="73" Height="24"/>
-        <Rectangle HorizontalAlignment="Center" Height="32" Margin="0,89,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="OkayButtonClick"/>
-        <TextBlock HorizontalAlignment="Center" Margin="0,93,0,0" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="OkayButtonClick"/>
+        <Rectangle HorizontalAlignment="Center" Height="32" Margin="0,37,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#FFB4DCB3" RadiusX="10" RadiusY="10" Grid.Row="2" MouseLeftButtonDown="OkayButtonClick"/>
+        <TextBlock HorizontalAlignment="Center" Grid.Row="2" TextWrapping="Wrap" Text="OKAY" VerticalAlignment="Top" FontSize="20" FontFamily="Cambria" MouseLeftButtonDown="OkayButtonClick" Margin="0,41,0,0"/>
         <ComboBox x:Name="ColorList" HorizontalAlignment="Left" Margin="84,158,0,0" VerticalAlignment="Top" Width="147" Height="20" Grid.Row="1" Grid.RowSpan="2"/>
         <ComboBox x:Name="FlexibilityList" HorizontalAlignment="Left" Margin="84,10,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.Row="1">
         </ComboBox>
         <ComboBox x:Name="PriorityList" HorizontalAlignment="Left" Margin="84,101,0,0" VerticalAlignment="Top" Width="76" Height="22" Grid.RowSpan="2"/>
-        <CheckBox x:Name="RecurringCheck" Content="Recurring?" HorizontalAlignment="Left" Margin="23,33,0,0" Grid.Row="2" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="118,33,0,0" TextWrapping="Wrap" Text="If so, how many instances?" VerticalAlignment="Top" Grid.Row="2"/>
-        <TextBox x:Name="NumInstancesInput" HorizontalAlignment="Left" Margin="298,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40" Grid.Row="2" Height="16"/>
-        <TextBlock HorizontalAlignment="Left" Margin="118,57,0,0" TextWrapping="Wrap" Text="# of weeks between each event" VerticalAlignment="Top" Grid.Row="2"/>
-        <TextBox x:Name="StepInput" HorizontalAlignment="Left" Margin="298,56,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40" Grid.Row="2" Height="16"/>
     </Grid>
 </Window>

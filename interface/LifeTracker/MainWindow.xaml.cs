@@ -92,7 +92,7 @@ namespace LifeTracker
         //DISPLAY HANDLING
 
         // Change Date Displayed (Date Picker)
-        private void ArrivalDatePicker_DateChanged(object sender, EventArgs e)
+        private void ArrivalDatePickerDateChanged(object sender, EventArgs e)
         {
             // Save current week data to calendar & JSON
             TimeSpan t = displayStartOfWeek - new DateTime(1970, 1, 1);
@@ -159,7 +159,7 @@ namespace LifeTracker
                 {
                     AddEventToDisplay(dayInWeek[j]);
                 }
-            } //IF WEEK WAS JUST CREATED, SOMETHING IS HAPPENING WHERE THE EVENT ADDED THERE IS DELETED IN THIS LOOP ??? DEBUG
+            }
 
             //Update DatePicker
             SelectDisplayWeek.SelectedDate = displayStartOfWeek;
@@ -292,8 +292,7 @@ namespace LifeTracker
 
                 DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(curEvent.GetDate_Time());
                 reminder.EventStart.Text = (dateTimeOffset.DateTime).ToString("HH:mm");
-
-                reminder.EventLocation.Text = curEvent.GetLocation().ToString(); //DEBUG
+                reminder.EventLocation.Text = curEvent.GetLocation().ToString();
                 reminder.Show();
             }
         }
@@ -371,7 +370,8 @@ namespace LifeTracker
 
                 int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
 
-                int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                // Get in terms of just day (no hours, auto start at 12)
+                int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); 
                 dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
                 DateTime adjustedDate = dateTimeOffset.DateTime;
 
@@ -390,15 +390,14 @@ namespace LifeTracker
                     DateTime dateTime = (dateTimeOffset.DateTime).AddDays(7 * ((Recurring)tempEvent).GetStep());
                     long epoch = (long)(dateTime - new DateTime(1970, 1, 1)).TotalSeconds;
 
-                    //CONVERT DATETIME TO EPOCH, USE INSTEAD OF tempEvent.GetDate_Time() //ERIN
-
                     int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
 
-                    int tempDateVal = (int)(epoch - (epoch % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    // Get in terms of just day (no hours, auto start at 12)
+                    int tempDateVal = (int)(epoch - (epoch % 86400)); 
                     dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
                     DateTime adjustedDate = FindNearestMonday(dateTimeOffset.DateTime);
 
-                    long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds; //DEBUG <----- monday of the first event, not changing for some reason
+                    long mondayEpoch = (long)(adjustedDate.AddDays(-curWeekDayNum) - new DateTime(1970, 1, 1)).TotalSeconds;
                     calendar.AddEvent(tempEvent, mondayEpoch);
                 }
             }
@@ -408,13 +407,13 @@ namespace LifeTracker
         {
             Event retEvent = new Event();
 
-            // Check whether recurring event or not
-            if (!(bool)createWin.RecurringCheck.IsChecked) retEvent = new Event();
+            // Check whether recurring event or not - eventually: !(bool)createWin.RecurringCheck.IsChecked
+            if (true) retEvent = new Event();
             else
             {
                 Recurring tempEvent = new Recurring();
-                tempEvent.SetNumInstances(Int32.Parse(createWin.NumInstancesInput.Text));
-                tempEvent.SetStep(Int32.Parse(createWin.StepInput.Text));
+                // tempEvent.SetNumInstances(Int32.Parse(createWin.NumInstancesInput.Text));
+                // tempEvent.SetStep(Int32.Parse(createWin.StepInput.Text));
 
                 retEvent = tempEvent;
             }
@@ -427,8 +426,7 @@ namespace LifeTracker
             retEvent.SetFlexibility(createWin.FlexibilityList.SelectedIndex + 1);
             retEvent.SetPriority(createWin.PriorityList.Text);
             retEvent.SetDescription(createWin.DescriptionInput.Text);
-
-            retEvent.SetLocation(createWin.LocationInput.Text); //DEBUG
+            retEvent.SetLocation(createWin.LocationInput.Text);
 
             return retEvent;
         }
@@ -475,8 +473,7 @@ namespace LifeTracker
             editWin.YearList.Text = dateTime.ToString("yyyy");
             editWin.ColorList.Text = selectedEvent.GetColor();
             editWin.DescriptionInput.Text = selectedEvent.GetDescription();
-
-            editWin.LocationInput.Text = selectedEvent.GetLocation(); //DEBUG
+            editWin.LocationInput.Text = selectedEvent.GetLocation();
 
             editWin.ShowDialog();
 
@@ -512,7 +509,8 @@ namespace LifeTracker
 
                     int curWeekDayNum = (int)(dateTime.DayOfWeek + 6) % 7;
 
-                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400)); //get in terms of just day (no hours, auto start at 12)
+                    // Get in terms of just day (no hours, auto start at 12)
+                    int tempDateVal = (int)(tempEvent.GetDate_Time() - (tempEvent.GetDate_Time() % 86400));
                     dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(tempDateVal);
                     DateTime adjustedDate = dateTimeOffset.DateTime;
 
@@ -590,7 +588,7 @@ namespace LifeTracker
             return ((double)t.TotalSeconds) / 3600;
         }
         // Find Duration of Event in terms of hours (Edited Pre-existing Event)
-        private double HoursDifferenceConversion(ref EditEventWindow editWin) //SIMPLIFY 12to24 CONVERTER - DEBUG
+        private double HoursDifferenceConversion(ref EditEventWindow editWin)
         {
             bool nonexistantDate1;
             bool nonexistantDate2;
@@ -875,22 +873,38 @@ namespace LifeTracker
     public class Event
     {
         // Private member variables
+
+        // Name of event
         [JsonProperty("name")]
-        private string name; // Name of event
+        private string name;
+
+        // Date and time in epoch
         [JsonProperty("date_time")]
-        private long date_time; // Date and time in epoch
+        private long date_time;
+
+        // How easily event can be moved
         [JsonProperty("flexibility")]
-        private int flexibility; // How easily event can be moved
+        private int flexibility;
+
+        // Color of event on display
         [JsonProperty("color")]
-        private string color; // Color of event on display
+        private string color;
+
+        // In terms of number of hours (NOT epoch)
         [JsonProperty("duration")]
-        private double duration; // In terms of number of hours (NOT epoch)
+        private double duration;
+
+        // How soon the event should be completed
         [JsonProperty("priority")]
-        private string priority; // How soon the event should be completed
+        private string priority;
+
+        // Short description of activity 
         [JsonProperty("description")]
-        private string description; // Short description of activity 
+        private string description;
+
+        // Where the event takes place
         [JsonProperty("location")]
-        private string location; // Where the event takes place
+        private string location; 
 
 
         // Name (Title) get and set
@@ -975,7 +989,14 @@ namespace LifeTracker
     }
     public class Recurring : Event
     {
-        public int numInstances; // How many events there are
+        // How many events there are
+        [JsonProperty("numInstances")]
+        private int numInstances;
+
+        // How often events occur 
+        [JsonProperty("step")]
+        private int step;
+
         public long GetNumInstances()
         {
             return numInstances;
@@ -985,7 +1006,6 @@ namespace LifeTracker
             numInstances = NumInstances;
         }
 
-        public int step; // How often events occur 
         public int GetStep()
         {
             return step;
@@ -1001,7 +1021,7 @@ namespace LifeTracker
     {
         // Private member variables
         [JsonProperty("mon")]
-        private List<Event> mon; // Lists of events (public for sake of serialization)
+        private List<Event> mon;
         [JsonProperty("tue")]
         private List<Event> tue;
         [JsonProperty("wed")]
@@ -1023,7 +1043,8 @@ namespace LifeTracker
         // Functions
         public Week()
         {
-            mon = new List<Event>(); // Lists of events
+            // Lists of events
+            mon = new List<Event>();
             tue = new List<Event>();
             wed = new List<Event>();
             thu = new List<Event>();
@@ -1035,7 +1056,8 @@ namespace LifeTracker
         }
         public void ClearWeek()
         {
-            mon = new List<Event>(); // Lists of events
+            // Lists of events
+            mon = new List<Event>(); 
             tue = new List<Event>();
             wed = new List<Event>();
             thu = new List<Event>();
@@ -1044,7 +1066,8 @@ namespace LifeTracker
             sun = new List<Event>();
         }
 
-        public long GetDate() // Return epoch date defining the week (Monday of week)
+        // Return epoch date defining the week (Monday of week)
+        public long GetDate() 
         {
             return date;
         }
@@ -1053,21 +1076,25 @@ namespace LifeTracker
             date = inputDate;
         }
 
-        public List<List<Event>> GetWeek() // Return list (week) of lists (days) of events
+        // Return list (week) of lists (days) of events
+        public List<List<Event>> GetWeek() 
         {
             return a_week;
         }
 
-        public void AddEvent(Event event1, int day) // Add individual event into week
+        // Add individual event into week
+        public void AddEvent(Event event1, int day) 
         {
             a_week[day].Add(event1);
         }
-        public void DeleteEvent(Event event1, int day) // Remove individual event from week
+        // Remove individual event from week
+        public void DeleteEvent(Event event1, int day) 
         {
             a_week[day].Remove(event1);
         }
 
-        public void ExportAvailability() // Export times of events into text file
+        // Export times of events into text file
+        public void ExportAvailability() 
         {
             // Create a file to write to (as applicable)
             string fileName = "Availability.txt";
@@ -1115,7 +1142,9 @@ namespace LifeTracker
         private Dictionary<long, Week> weeks = new Dictionary<long, Week>();
 
         // Functions
-        public Week GetWeek(long key) // Return week by entering epoch value corresponding to Monday of that week
+
+        // Return week by entering epoch value corresponding to Monday of that week
+        public Week GetWeek(long key) 
         {
             if (!weeks.ContainsKey(key))
             {
@@ -1127,20 +1156,24 @@ namespace LifeTracker
             return weeks[key];
         }
 
-        public void AddWeek(Week week) // Add week (given week data)
+        // Add week (given week data)
+        public void AddWeek(Week week) 
         {
             if (!weeks.ContainsKey(week.GetDate())) weeks.Add(week.GetDate(), week);
         }
-        public void RemoveWeek(long key) // Remove week from dictionary (given epoch date for Monday)
+        // Remove week from dictionary (given epoch date for Monday)
+        public void RemoveWeek(long key) 
         {
             weeks.Remove(key);
         }
-        public void SetWeek(long key, Week week) // Update week value (given epoch date for Monday & week data)
+        // Update week value (given epoch date for Monday & week data)
+        public void SetWeek(long key, Week week) 
         {
             weeks[key] = week;
         }
 
-        public void AddEvent(Event inputEvent, long date) // Add event, corresponding start-of-week in epoch format
+        // Add event, corresponding start-of-week in epoch format
+        public void AddEvent(Event inputEvent, long date) 
         {
             if (weeks.ContainsKey(date))
             {
@@ -1149,26 +1182,32 @@ namespace LifeTracker
             else
             {
                 Week newWeek = new Week();
-                newWeek.AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
                 weeks[date] = newWeek;
+
+                weeks[date].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
             }
         }
-        public void DeleteEvent(Event inputEvent) // Delete a specific event from week
-        {
-            weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
-        }
-        public void AddEvent(Event inputEvent) // Add event (given just event)
+        // Add event (given just event)
+        public void AddEvent(Event inputEvent) 
         {
             weeks[inputEvent.GetDate_Time()].AddEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
         }
 
-        private int EpochToWeekday(long inputDate) // Convert epoch long to integer (representing day of week)
+        // Delete a specific event from week
+        public void DeleteEvent(Event inputEvent) 
+        {
+            weeks[inputEvent.GetDate_Time()].DeleteEvent(inputEvent, EpochToWeekday(inputEvent.GetDate_Time()));
+        }
+
+        // Convert epoch long to integer (representing day of week)
+        private int EpochToWeekday(long inputDate) 
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(inputDate);
             return (int)(dateTimeOffset.DateTime).DayOfWeek;
         }
 
-        public void Save(String filePath) // Save calendar class to XML file
+        // Save calendar class to XML file
+        public void Save(String filePath) 
         {
             // Check if the file exists, create new one if not
             if (!File.Exists(filePath))
@@ -1176,12 +1215,12 @@ namespace LifeTracker
                 File.Create(filePath);
             }
 
-
             // Serialize data
             string serializedCalander = JsonConvert.SerializeObject(this);
             File.WriteAllText(filePath, serializedCalander);
         }
-        public Calendar Load(String filePath) // Load calendar class from XML file
+        // Load calendar class from XML file
+        public Calendar Load(String filePath) 
         {
             // Check if the file exists, create new one if not
             if (!File.Exists(filePath))
@@ -1190,13 +1229,14 @@ namespace LifeTracker
             }
 
             // Deserialize data
-            string serializedCalander = File.ReadAllText(filePath);
-            Calendar deserializedCalander = JsonConvert.DeserializeObject<Calendar>(serializedCalander);
+            string serializedCalender = File.ReadAllText(filePath);
+            Calendar deserializedCalender = JsonConvert.DeserializeObject<Calendar>(serializedCalender);
 
-            return deserializedCalander;
+            return deserializedCalender;
         }
 
-        public Event GetSuggestion(Event inevent, Week week) // Suggest new event time / date
+        // Suggest new event time / date
+        public Event GetSuggestion(Event inevent, Week week) 
         {
             Dictionary<Event, long> scores = new Dictionary<Event, long>();
             Event bestEvent = inevent;

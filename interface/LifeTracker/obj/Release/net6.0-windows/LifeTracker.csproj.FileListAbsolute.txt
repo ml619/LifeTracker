@@ -1,0 +1,32 @@
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\Meeting Reminder.mp3
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\Meeting Reminder.wav
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\LifeTracker.exe
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\LifeTracker.deps.json
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\LifeTracker.runtimeconfig.json
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\LifeTracker.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\ref\LifeTracker.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\LifeTracker.pdb
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\bin\Release\net6.0-windows\Newtonsoft.Json.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.csproj.AssemblyReference.cache
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\CreateEventWindow.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\EditEventWindow.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\MainWindow.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\ReminderWindow.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\App.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker_Content.g.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker_MarkupCompile.cache
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker_MarkupCompile.lref
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\CreateEventWindow.baml
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\EditEventWindow.baml
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\MainWindow.baml
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\ReminderWindow.baml
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.g.resources
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.AssemblyInfoInputs.cache
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.AssemblyInfo.cs
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.csproj.CoreCompileInputs.cache
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.csproj.CopyComplete
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\ref\LifeTracker.dll
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.pdb
+C:\Users\cohene4\Documents\LifeTracker\interface\LifeTracker\obj\Release\net6.0-windows\LifeTracker.genruntimeconfig.cache

@@ -37,7 +37,7 @@
                 <Button Content="Save &amp; Exit" HorizontalAlignment="Left" Margin="17,204,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFF39A9A" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="CloseButtonClick" Grid.Row="1"/>
                 <Button Content="Mute" Name="MuteButton" HorizontalAlignment="Left" Margin="17,160,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFB4DCB3" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MuteButtonClick" Grid.Row="1"/>
                 <Button Content="Minimize" HorizontalAlignment="Left" Margin="17,182,0,0" VerticalAlignment="Top" Width="51" Height="20" Background="#FFFFEFA0" BorderBrush="Black" Foreground="Black" FontFamily="Cambria" FontSize="9" FontWeight="Bold" Click="MinButtonClick" Grid.Row="1"/>
-                <DatePicker SelectedDateChanged="ArrivalDatePicker_DateChanged" HorizontalAlignment="Left" Margin="100,18,0,0" VerticalAlignment="Top" Name="SelectDisplayWeek"/>
+                <DatePicker SelectedDateChanged="ArrivalDatePickerDateChanged" HorizontalAlignment="Left" Margin="100,18,0,0" VerticalAlignment="Top" Name="SelectDisplayWeek"/>
                 <TextBlock Name="MondayText" HorizontalAlignment="Left" Margin="110,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" />
                 <TextBlock Name="TuesdayText" HorizontalAlignment="Left" Margin="202,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" />
                 <TextBlock x:Name="mondayText" HorizontalAlignment="Left" Margin="120,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center" TextAlignment="Center"/>
